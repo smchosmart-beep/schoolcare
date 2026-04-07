@@ -109,7 +109,7 @@ export default function HealthJournal({ teacherId }: Props) {
     toast.success("엑셀 파일이 다운로드되었습니다.");
   };
 
-  const toast = { success: (msg: string) => import("sonner").then((m) => m.toast.success(msg)) };
+  
 
   return (
     <div className="space-y-6">
