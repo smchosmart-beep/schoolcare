@@ -110,6 +110,9 @@ export default function Admin() {
           <TabsContent value="journal">
             <HealthJournal teacherId={user.id} />
           </TabsContent>
+          <TabsContent value="statistics">
+            <VisitStatistics teacherId={user.id} />
+          </TabsContent>
         </Tabs>
       </main>
     </div>
