@@ -113,7 +113,7 @@ export default function HealthJournal({ teacherId }: Props) {
       for (let i = 0; i < 5; i++) {
         const day = addDays(start, i);
         const dayVisits = visits.filter((v) => isSameDay(new Date(v.visited_at), day));
-        const sheetName = `${dayNames[i]}(${format(day, "M/d")})`;
+        const sheetName = `${dayNames[i]}(${format(day, "M-d")})`;
         const rows = dayVisits.length > 0
           ? dayVisits.map(formatVisitRow)
           : [{ 날짜: format(day, "yyyy-MM-dd"), 시간: "", 학년: "", 반: "", 번호: "", 이름: "기록 없음", 유형: "", "스스로 치료 항목": "", 건강문제: "", "처치 및 조치": "", 투약내용: "", 상태: "" }];
