@@ -1,54 +1,37 @@
 
 
-# 키오스크 학생 명단 안 보이는 문제 수정
+# 키오스크 학생 명단 — 각 기기에서 독립 업로드
 
-## 원인
-Admin 페이지에서 학생 명단을 localStorage에 저장하지만, 키오스크는 `window.open`으로 새 탭/창에서 열립니다. Lovable 미리보기 환경에서는 origin이 달라 **localStorage가 공유되지 않습니다.** 따라서 키오스크에서 `loadStudents()`를 호출해도 빈 배열이 반환됩니다.
+## 현재 상황
+- 키오스크(태블릿)에서 학생이 "스스로 치료" / "보건 선생님 만나기" 선택 → 학년/반/이름 선택 → DB에 기록
+- 보건교사 PC(Admin)에서 DB의 방문 기록을 보고 보건일지 작성
+- **DB를 통해 두 기기가 연동**됨 (독립이 아님)
+- 문제: 학생 명단만 localStorage에 있어서 키오스크 기기에서 못 읽음
 
 ## 해결 방안
-키오스크 창을 열 때 Admin 페이지의 localStorage에서 학생 데이터를 **URL hash 또는 postMessage**로 전달합니다. 학생 데이터가 클 수 있으므로 `postMessage` 방식이 적합합니다.
+키오스크 페이지에도 학생 명단 업로드 기능을 넣어서, 태블릿에서도 최초 1회 업로드하면 됩니다. 두 기기 모두 같은 계정으로 로그인하고, 각각의 localStorage에 학생 명단을 갖고 있으면 됩니다.
 
-### 변경 사항
+## 변경 사항
 
-**1. `src/pages/Admin.tsx`** — 키오스크 창 열고 학생 데이터 전송
-- `window.open` 후 반환된 window 참조를 저장
-- 키오스크 창이 로드되면 `postMessage`로 학생 데이터 전송
-```typescript
-const handleKioskMode = () => {
-  if (user) {
-    localStorage.setItem("kiosk-teacher-id", user.id);
-    const kioskWindow = window.open(`/kiosk?teacher=${user.id}`, "kiosk-window");
-    // 키오스크 창이 로드되면 학생 데이터 전송
-    if (kioskWindow) {
-      const sendStudents = () => {
-        const students = loadStudents();
-        kioskWindow.postMessage({ type: "STUDENT_DATA", students }, "*");
-      };
-      // 약간의 딜레이 후 전송 (창 로드 대기)
-      setTimeout(sendStudents, 1500);
-      setTimeout(sendStudents, 3000);
-    }
-  }
-};
+### 1. `src/pages/Kiosk.tsx` — 인증 추가 + 학생 명단 없을 때 업로드 UI
+- `useAuth()` 훅으로 로그인 상태 확인, 미로그인 시 `/login`으로 리다이렉트
+- `teacherId`를 `user.id`에서 가져옴 (URL 파라미터/localStorage 로직 제거)
+- 학생 명단이 비어있으면 `StudentUpload` 컴포넌트 표시
+- `postMessage` 리스너 제거
+
+### 2. `src/pages/Admin.tsx` — handleKioskMode 단순화
+- `window.open`, `postMessage`, `loadStudents` 관련 코드 제거
+- 키오스크 버튼 클릭 시 `navigate("/kiosk")`로 같은 탭 이동 (또는 안내 메시지: "태블릿에서 로그인 후 사용하세요")
+
+### 3. `src/pages/Kiosk.tsx` — 관리자 페이지 이동 버튼
+- 화면 구석에 작은 "관리자 페이지" 버튼 추가 (보건교사가 같은 기기에서 전환 가능)
+
+## 운영 흐름
+```text
+[태블릿 - 키오스크]              [PC - 관리자]
+로그인 → 학생 명단 업로드(1회)    로그인 → 학생 명단 업로드(1회)
+    ↓                              ↓
+학생이 방문 등록 → DB 저장    ←→  DB에서 방문 기록 조회
+                                   보건일지 작성
 ```
-
-**2. `src/pages/Kiosk.tsx`** — `message` 이벤트로 학생 데이터 수신
-- `useEffect`에서 `window.addEventListener("message", ...)` 추가
-- 수신한 학생 데이터를 키오스크의 localStorage에도 저장하고 state에 반영
-```typescript
-useEffect(() => {
-  const handler = (e: MessageEvent) => {
-    if (e.data?.type === "STUDENT_DATA" && Array.isArray(e.data.students)) {
-      saveStudents(e.data.students);
-      setStudents(e.data.students);
-    }
-  };
-  window.addEventListener("message", handler);
-  return () => window.removeEventListener("message", handler);
-}, []);
-```
-
-**3. `src/pages/Admin.tsx`** — `loadStudents` import 추가
-
-이렇게 하면 origin이 달라도 `postMessage`로 학생 데이터가 키오스크 창에 전달되어 학년/반/이름 선택이 정상 작동합니다.
 
