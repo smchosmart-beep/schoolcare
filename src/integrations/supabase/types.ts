@@ -14,7 +14,117 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      self_treatment_options: {
+        Row: {
+          created_at: string
+          icon: string | null
+          id: string
+          name: string
+          sort_order: number | null
+          teacher_id: string
+        }
+        Insert: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name: string
+          sort_order?: number | null
+          teacher_id: string
+        }
+        Update: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name?: string
+          sort_order?: number | null
+          teacher_id?: string
+        }
+        Relationships: []
+      }
+      visits: {
+        Row: {
+          created_at: string
+          health_issue: string | null
+          id: string
+          medication: string | null
+          self_treatment_item: string | null
+          status: string
+          student_class: number
+          student_grade: number
+          student_name: string
+          student_number: number
+          teacher_id: string
+          treatment: string | null
+          updated_at: string
+          visit_type: string
+          visited_at: string
+        }
+        Insert: {
+          created_at?: string
+          health_issue?: string | null
+          id?: string
+          medication?: string | null
+          self_treatment_item?: string | null
+          status?: string
+          student_class: number
+          student_grade: number
+          student_name: string
+          student_number: number
+          teacher_id: string
+          treatment?: string | null
+          updated_at?: string
+          visit_type?: string
+          visited_at?: string
+        }
+        Update: {
+          created_at?: string
+          health_issue?: string | null
+          id?: string
+          medication?: string | null
+          self_treatment_item?: string | null
+          status?: string
+          student_class?: number
+          student_grade?: number
+          student_name?: string
+          student_number?: number
+          teacher_id?: string
+          treatment?: string | null
+          updated_at?: string
+          visit_type?: string
+          visited_at?: string
+        }
+        Relationships: []
+      }
+      waiting_queue: {
+        Row: {
+          created_at: string
+          id: string
+          student_class: number
+          student_grade: number
+          student_name: string
+          student_number: number
+          teacher_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          student_class: number
+          student_grade: number
+          student_name: string
+          student_number: number
+          teacher_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          student_class?: number
+          student_grade?: number
+          student_name?: string
+          student_number?: number
+          teacher_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
