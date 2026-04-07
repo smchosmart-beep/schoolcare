@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Settings } from "lucide-react";
+import { Settings, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import QuickInputSettings, { type Preset } from "./QuickInputSettings";
 
