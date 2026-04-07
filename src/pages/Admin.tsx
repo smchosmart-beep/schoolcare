@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Heart, LogOut, Monitor, LayoutDashboard, Settings, FileText, Upload } from "lucide-react";
-import { loadStudents } from "@/lib/students";
+
 import AdminDashboard from "@/components/admin/AdminDashboard";
 import SelfTreatmentSettings from "@/components/admin/SelfTreatmentSettings";
 import StudentUpload from "@/components/admin/StudentUpload";

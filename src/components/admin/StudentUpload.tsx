@@ -59,6 +59,7 @@ export default function StudentUpload({ onUploadComplete }: StudentUploadProps =
         saveStudents(parsed);
         setStudents(parsed);
         toast.success(`${parsed.length}명의 학생 명단을 저장했습니다.`);
+        onUploadComplete?.();
       } catch {
         toast.error("파일을 읽는 중 오류가 발생했습니다.");
       }
