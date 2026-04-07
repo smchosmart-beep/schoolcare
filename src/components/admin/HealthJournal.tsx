@@ -18,6 +18,7 @@ interface Visit {
   health_issue: string | null;
   treatment: string | null;
   medication: string | null;
+  temperature: string | null;
   status: string;
   visited_at: string;
 }
