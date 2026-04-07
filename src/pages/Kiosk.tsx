@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { loadStudents, getGrades, getClasses, getStudentsInClass, type Student } from "@/lib/students";
+import { loadStudents, saveStudents, getGrades, getClasses, getStudentsInClass, type Student } from "@/lib/students";
 import { toast } from "sonner";
 import { Heart, Stethoscope, ArrowLeft, Users, Clock } from "lucide-react";
 
@@ -42,6 +42,18 @@ export default function Kiosk() {
 
   useEffect(() => {
     setStudents(loadStudents());
+  }, []);
+
+  // postMessage로 학생 데이터 수신
+  useEffect(() => {
+    const handler = (e: MessageEvent) => {
+      if (e.data?.type === "STUDENT_DATA" && Array.isArray(e.data.students)) {
+        saveStudents(e.data.students);
+        setStudents(e.data.students);
+      }
+    };
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
   }, []);
 
   // Fetch queue

@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Heart, LogOut, Monitor, LayoutDashboard, Settings, FileText, Upload } from "lucide-react";
+import { loadStudents } from "@/lib/students";
 import AdminDashboard from "@/components/admin/AdminDashboard";
 import SelfTreatmentSettings from "@/components/admin/SelfTreatmentSettings";
 import StudentUpload from "@/components/admin/StudentUpload";
@@ -24,7 +25,15 @@ export default function Admin() {
   const handleKioskMode = () => {
     if (user) {
       localStorage.setItem("kiosk-teacher-id", user.id);
-      window.open(`/kiosk?teacher=${user.id}`, "kiosk-window");
+      const kioskWindow = window.open(`/kiosk?teacher=${user.id}`, "kiosk-window");
+      if (kioskWindow) {
+        const sendStudents = () => {
+          const students = loadStudents();
+          kioskWindow.postMessage({ type: "STUDENT_DATA", students }, "*");
+        };
+        setTimeout(sendStudents, 1500);
+        setTimeout(sendStudents, 3000);
+      }
     }
   };
 
