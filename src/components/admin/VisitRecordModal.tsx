@@ -164,6 +164,14 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, teacher
                 rows={2}
               />
             </div>
+            <div className="space-y-2">
+              <Label>체온</Label>
+              <Input
+                placeholder="예: 37.5"
+                value={temperature}
+                onChange={(e) => setTemperature(e.target.value)}
+              />
+            </div>
           </div>
 
           <DialogFooter>
