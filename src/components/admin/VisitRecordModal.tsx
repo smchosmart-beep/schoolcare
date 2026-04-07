@@ -52,7 +52,7 @@ export default function VisitRecordModal({ open, onClose, visit, onSave }: Props
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label>건강문제 (보건실에 왜 왔나요?)</Label>
+            <Label>증상</Label>
             <Textarea
               placeholder="예: 두통, 복통, 넘어져서 무릎 찰과상..."
               value={healthIssue}
