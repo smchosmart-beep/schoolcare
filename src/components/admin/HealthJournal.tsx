@@ -103,6 +103,8 @@ export default function HealthJournal({ teacherId }: Props) {
     if (colWidths[5]) colWidths[5].wch = Math.max(colWidths[5].wch, 7);
     if (colWidths[6]) colWidths[6].wch = Math.max(colWidths[6].wch, 15);
     if (colWidths[7]) colWidths[7].wch = Math.max(colWidths[7].wch, 25);
+    if (colWidths[9]) colWidths[9].wch = Math.max(colWidths[9].wch, 65);
+    if (colWidths[10]) colWidths[10].wch = Math.max(colWidths[10].wch, 30);
     ws["!cols"] = colWidths;
   };
 
