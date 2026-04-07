@@ -5,12 +5,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Heart, LogOut, Monitor, LayoutDashboard, Settings, FileText, Upload } from "lucide-react";
+import { Heart, LogOut, Monitor, LayoutDashboard, Settings, FileText, Upload, BarChart3 } from "lucide-react";
 
 import AdminDashboard from "@/components/admin/AdminDashboard";
 import SelfTreatmentSettings from "@/components/admin/SelfTreatmentSettings";
 import StudentUpload from "@/components/admin/StudentUpload";
 import HealthJournal from "@/components/admin/HealthJournal";
+import VisitStatistics from "@/components/admin/VisitStatistics";
 
 export default function Admin() {
   const { user, loading, signOut } = useAuth();
@@ -74,7 +75,7 @@ export default function Admin() {
       {/* Content */}
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid">
+          <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid">
             <TabsTrigger value="dashboard" className="gap-2">
               <LayoutDashboard className="h-4 w-4" />
               <span className="hidden sm:inline">대시보드</span>
@@ -91,6 +92,10 @@ export default function Admin() {
               <FileText className="h-4 w-4" />
               <span className="hidden sm:inline">보건일지</span>
             </TabsTrigger>
+            <TabsTrigger value="statistics" className="gap-2">
+              <BarChart3 className="h-4 w-4" />
+              <span className="hidden sm:inline">이용현황</span>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard">
@@ -104,6 +109,9 @@ export default function Admin() {
           </TabsContent>
           <TabsContent value="journal">
             <HealthJournal teacherId={user.id} />
+          </TabsContent>
+          <TabsContent value="statistics">
+            <VisitStatistics teacherId={user.id} />
           </TabsContent>
         </Tabs>
       </main>
