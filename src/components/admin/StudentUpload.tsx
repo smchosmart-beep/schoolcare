@@ -5,7 +5,11 @@ import { toast } from "sonner";
 import { Upload, FileSpreadsheet, Trash2, Users } from "lucide-react";
 import * as XLSX from "xlsx";
 
-export default function StudentUpload() {
+interface StudentUploadProps {
+  onUploadComplete?: () => void;
+}
+
+export default function StudentUpload({ onUploadComplete }: StudentUploadProps = {}) {
   const [students, setStudents] = useState<Student[]>(loadStudents());
   const fileRef = useRef<HTMLInputElement>(null);
 

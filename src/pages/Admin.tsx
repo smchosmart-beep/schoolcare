@@ -23,18 +23,7 @@ export default function Admin() {
   }, [user, loading, navigate]);
 
   const handleKioskMode = () => {
-    if (user) {
-      localStorage.setItem("kiosk-teacher-id", user.id);
-      const kioskWindow = window.open(`/kiosk?teacher=${user.id}`, "kiosk-window");
-      if (kioskWindow) {
-        const sendStudents = () => {
-          const students = loadStudents();
-          kioskWindow.postMessage({ type: "STUDENT_DATA", students }, "*");
-        };
-        setTimeout(sendStudents, 1500);
-        setTimeout(sendStudents, 3000);
-      }
-    }
+    navigate("/kiosk");
   };
 
   const handleSignOut = async () => {
