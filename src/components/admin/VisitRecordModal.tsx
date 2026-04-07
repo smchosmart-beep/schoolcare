@@ -61,10 +61,20 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, teacher
     }
   }, [visit]);
 
-  // F1~F8 keyboard shortcuts
+  // F1~F8 + Alt+1~9 keyboard shortcuts
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => {
+      // Alt+1~9 for extra presets
+      if (e.altKey && /^[1-9]$/.test(e.key)) {
+        e.preventDefault();
+        const extraPresets = presets.filter((p) => p.slot_number > 8).slice(0, 9);
+        const idx = parseInt(e.key) - 1;
+        if (extraPresets[idx]) {
+          applyPreset(extraPresets[idx].slot_number);
+        }
+        return;
+      }
       const match = e.key.match(/^F(\d)$/);
       if (!match) return;
       const num = parseInt(match[1]);
@@ -132,14 +142,15 @@ className="h-7 w-[6.5rem] px-1 text-xs"
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button variant="outline" size="sm" className="h-7 flex-1 px-2 text-xs">
-                      +더보기 <ChevronDown className="h-3 w-3 ml-0.5" />
+                      빠른 입력 추가 <ChevronDown className="h-3 w-3 ml-0.5" />
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-2 pointer-events-auto" align="start">
                     <div className="space-y-1 max-h-48 overflow-y-auto">
                       {presets
                         .filter((p) => p.slot_number > 8)
-                        .map((preset) => (
+                        .slice(0, 9)
+                        .map((preset, index) => (
                           <Button
                             key={preset.slot_number}
                             variant="ghost"
@@ -147,10 +158,12 @@ className="h-7 w-[6.5rem] px-1 text-xs"
                             className="w-full justify-start h-8 text-xs"
                             onClick={() => applyPreset(preset.slot_number)}
                           >
-                            <span className="font-semibold mr-2">{preset.label || `#${preset.slot_number}`}</span>
+                            <span className="font-mono text-[10px] opacity-50 mr-1.5">#{index + 1}</span>
+                            <span className="font-semibold mr-2">{preset.label || `프리셋 ${index + 1}`}</span>
                             <span className="text-muted-foreground truncate">
                               {preset.health_issue || preset.treatment || ""}
                             </span>
+                            <span className="ml-auto text-[10px] opacity-40">Alt+{index + 1}</span>
                           </Button>
                         ))}
                     </div>
