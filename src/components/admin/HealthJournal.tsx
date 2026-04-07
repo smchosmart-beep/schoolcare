@@ -220,6 +220,7 @@ export default function HealthJournal({ teacherId }: Props) {
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">건강문제</th>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">처치</th>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">투약</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">체온</th>
                 </tr>
               </thead>
               <tbody>
