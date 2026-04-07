@@ -95,7 +95,7 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, teacher
   return (
     <>
       <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-lg">
               {visit.student_name} ({visit.student_grade}학년 {visit.student_class}반 {visit.student_number}번)
