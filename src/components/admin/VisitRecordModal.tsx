@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,6 +17,7 @@ interface Visit {
   health_issue: string | null;
   treatment: string | null;
   medication: string | null;
+  temperature: string | null;
   visited_at: string;
 }
 
@@ -23,7 +25,7 @@ interface Props {
   open: boolean;
   onClose: () => void;
   visit: Visit | null;
-  onSave: (data: { health_issue: string; treatment: string; medication: string }) => void;
+  onSave: (data: { health_issue: string; treatment: string; medication: string; temperature: string }) => void;
   teacherId: string;
 }
 
@@ -31,6 +33,7 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, teacher
   const [healthIssue, setHealthIssue] = useState("");
   const [treatment, setTreatment] = useState("");
   const [medication, setMedication] = useState("");
+  const [temperature, setTemperature] = useState("");
   const [presets, setPresets] = useState<Preset[]>([]);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
@@ -53,6 +56,7 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, teacher
       setHealthIssue(visit.health_issue || "");
       setTreatment(visit.treatment || "");
       setMedication(visit.medication || "");
+      setTemperature(visit.temperature || "");
     }
   }, [visit]);
 
@@ -160,13 +164,21 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, teacher
                 rows={2}
               />
             </div>
+            <div className="space-y-2">
+              <Label>체온</Label>
+              <Input
+                placeholder="예: 37.5"
+                value={temperature}
+                onChange={(e) => setTemperature(e.target.value)}
+              />
+            </div>
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={onClose}>
               취소
             </Button>
-            <Button onClick={() => onSave({ health_issue: healthIssue, treatment, medication })}>
+            <Button onClick={() => onSave({ health_issue: healthIssue, treatment, medication, temperature })}>
               저장
             </Button>
           </DialogFooter>

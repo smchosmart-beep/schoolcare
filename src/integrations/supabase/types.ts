@@ -87,6 +87,7 @@ export type Database = {
           student_name: string
           student_number: number
           teacher_id: string
+          temperature: string | null
           treatment: string | null
           updated_at: string
           visit_type: string
@@ -104,6 +105,7 @@ export type Database = {
           student_name: string
           student_number: number
           teacher_id: string
+          temperature?: string | null
           treatment?: string | null
           updated_at?: string
           visit_type?: string
@@ -121,6 +123,7 @@ export type Database = {
           student_name?: string
           student_number?: number
           teacher_id?: string
+          temperature?: string | null
           treatment?: string | null
           updated_at?: string
           visit_type?: string

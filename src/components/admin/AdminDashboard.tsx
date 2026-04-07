@@ -25,6 +25,7 @@ interface Visit {
   health_issue: string | null;
   treatment: string | null;
   medication: string | null;
+  temperature: string | null;
   status: string;
   visited_at: string;
   created_at: string;
@@ -124,7 +125,7 @@ export default function AdminDashboard({ teacherId }: Props) {
     setModalOpen(true);
   };
 
-  const handleSaveVisit = async (data: { health_issue: string; treatment: string; medication: string }) => {
+  const handleSaveVisit = async (data: { health_issue: string; treatment: string; medication: string; temperature: string }) => {
     if (!selectedVisit) return;
     await supabase
       .from("visits")
@@ -132,6 +133,7 @@ export default function AdminDashboard({ teacherId }: Props) {
         health_issue: data.health_issue,
         treatment: data.treatment,
         medication: data.medication,
+        temperature: data.temperature || null,
         status: "completed",
       })
       .eq("id", selectedVisit.id);

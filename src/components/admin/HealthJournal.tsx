@@ -18,6 +18,7 @@ interface Visit {
   health_issue: string | null;
   treatment: string | null;
   medication: string | null;
+  temperature: string | null;
   status: string;
   visited_at: string;
 }
@@ -92,6 +93,7 @@ export default function HealthJournal({ teacherId }: Props) {
     건강문제: v.health_issue || "",
     "처치 및 조치": v.treatment || "",
     투약내용: v.medication || "",
+    체온: v.temperature || "",
     상태: v.status === "completed" ? "완료" : "진행중",
   });
 
