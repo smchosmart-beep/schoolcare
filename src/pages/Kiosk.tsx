@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { loadStudents, getGrades, getClasses, getStudentsInClass, type Student } from "@/lib/students";
+import { loadStudents, saveStudents, getGrades, getClasses, getStudentsInClass, type Student } from "@/lib/students";
 import { toast } from "sonner";
 import { Heart, Stethoscope, ArrowLeft, Users, Clock } from "lucide-react";
 
