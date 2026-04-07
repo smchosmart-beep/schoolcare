@@ -80,33 +80,58 @@ export default function HealthJournal({ teacherId }: Props) {
     return format(currentDate, "yyyy년 M월", { locale: ko });
   };
 
-  const handleExport = () => {
-    const rows = visits.map((v) => ({
-      날짜: format(new Date(v.visited_at), "yyyy-MM-dd"),
-      시간: format(new Date(v.visited_at), "HH:mm"),
-      학년: v.student_grade,
-      반: v.student_class,
-      번호: v.student_number,
-      이름: v.student_name,
-      유형: v.visit_type === "self_treatment" ? "스스로 치료" : "보건선생님",
-      "스스로 치료 항목": v.self_treatment_item || "",
-      건강문제: v.health_issue || "",
-      "처치 및 조치": v.treatment || "",
-      투약내용: v.medication || "",
-      상태: v.status === "completed" ? "완료" : "진행중",
-    }));
+  const formatVisitRow = (v: Visit) => ({
+    날짜: format(new Date(v.visited_at), "yyyy-MM-dd"),
+    시간: format(new Date(v.visited_at), "HH:mm"),
+    학년: v.student_grade,
+    반: v.student_class,
+    번호: v.student_number,
+    이름: v.student_name,
+    유형: v.visit_type === "self_treatment" ? "스스로 치료" : "보건선생님",
+    "스스로 치료 항목": v.self_treatment_item || "",
+    건강문제: v.health_issue || "",
+    "처치 및 조치": v.treatment || "",
+    투약내용: v.medication || "",
+    상태: v.status === "completed" ? "완료" : "진행중",
+  });
 
-    const ws = XLSX.utils.json_to_sheet(rows);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "보건일지");
-
-    // Auto-width columns
-    const colWidths = Object.keys(rows[0] || {}).map((key) => ({
-      wch: Math.max(key.length * 2, ...rows.map((r) => String((r as any)[key]).length * 1.5)),
+  const applyColumnWidths = (ws: XLSX.WorkSheet, rows: Record<string, any>[]) => {
+    if (rows.length === 0) return;
+    const colWidths = Object.keys(rows[0]).map((key) => ({
+      wch: Math.max(key.length * 2, ...rows.map((r) => String(r[key]).length * 1.5)),
     }));
     ws["!cols"] = colWidths;
+  };
 
-    XLSX.writeFile(wb, `보건일지_${format(currentDate, "yyyyMMdd")}.xlsx`);
+  const handleExport = () => {
+    const wb = XLSX.utils.book_new();
+
+    if (viewMode === "weekly") {
+      const { start } = getDateRange();
+      const dayNames = ["월", "화", "수", "목", "금"];
+
+      for (let i = 0; i < 5; i++) {
+        const day = addDays(start, i);
+        const dayVisits = visits.filter((v) => isSameDay(new Date(v.visited_at), day));
+        const sheetName = `${dayNames[i]}(${format(day, "M/d")})`;
+        const rows = dayVisits.length > 0
+          ? dayVisits.map(formatVisitRow)
+          : [{ 날짜: format(day, "yyyy-MM-dd"), 시간: "", 학년: "", 반: "", 번호: "", 이름: "기록 없음", 유형: "", "스스로 치료 항목": "", 건강문제: "", "처치 및 조치": "", 투약내용: "", 상태: "" }];
+        const ws = XLSX.utils.json_to_sheet(rows);
+        applyColumnWidths(ws, rows);
+        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+      }
+
+      const { end } = getDateRange();
+      XLSX.writeFile(wb, `보건일지_주간_${format(start, "yyyyMMdd")}-${format(end, "yyyyMMdd")}.xlsx`);
+    } else {
+      const rows = visits.map(formatVisitRow);
+      const ws = XLSX.utils.json_to_sheet(rows);
+      applyColumnWidths(ws, rows);
+      XLSX.utils.book_append_sheet(wb, ws, "보건일지");
+      XLSX.writeFile(wb, `보건일지_${format(currentDate, "yyyyMMdd")}.xlsx`);
+    }
+
     toast.success("엑셀 파일이 다운로드되었습니다.");
   };
 
