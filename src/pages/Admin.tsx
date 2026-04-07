@@ -92,6 +92,10 @@ export default function Admin() {
               <FileText className="h-4 w-4" />
               <span className="hidden sm:inline">보건일지</span>
             </TabsTrigger>
+            <TabsTrigger value="statistics" className="gap-2">
+              <BarChart3 className="h-4 w-4" />
+              <span className="hidden sm:inline">이용현황</span>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard">
