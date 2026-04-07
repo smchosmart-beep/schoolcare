@@ -25,7 +25,7 @@ interface Props {
   open: boolean;
   onClose: () => void;
   visit: Visit | null;
-  onSave: (data: { health_issue: string; treatment: string; medication: string }) => void;
+  onSave: (data: { health_issue: string; treatment: string; medication: string; temperature: string }) => void;
   teacherId: string;
 }
 
