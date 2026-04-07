@@ -1,0 +1,227 @@
+import { useState, useEffect, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
+import { ko } from "date-fns/locale";
+import { Download, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import * as XLSX from "xlsx";
+
+interface Visit {
+  id: string;
+  student_name: string;
+  student_grade: number;
+  student_class: number;
+  student_number: number;
+  visit_type: string;
+  self_treatment_item: string | null;
+  health_issue: string | null;
+  treatment: string | null;
+  medication: string | null;
+  status: string;
+  visited_at: string;
+}
+
+type ViewMode = "daily" | "weekly" | "monthly";
+
+interface Props {
+  teacherId: string;
+}
+
+export default function HealthJournal({ teacherId }: Props) {
+  const [visits, setVisits] = useState<Visit[]>([]);
+  const [viewMode, setViewMode] = useState<ViewMode>("daily");
+  const [currentDate, setCurrentDate] = useState(new Date());
+
+  const getDateRange = useCallback(() => {
+    if (viewMode === "daily") {
+      const start = new Date(currentDate);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(currentDate);
+      end.setHours(23, 59, 59, 999);
+      return { start, end };
+    } else if (viewMode === "weekly") {
+      return { start: startOfWeek(currentDate, { locale: ko }), end: endOfWeek(currentDate, { locale: ko }) };
+    } else {
+      return { start: startOfMonth(currentDate), end: endOfMonth(currentDate) };
+    }
+  }, [currentDate, viewMode]);
+
+  const fetchVisits = useCallback(async () => {
+    const { start, end } = getDateRange();
+    const { data } = await supabase
+      .from("visits")
+      .select("*")
+      .eq("teacher_id", teacherId)
+      .gte("visited_at", start.toISOString())
+      .lte("visited_at", end.toISOString())
+      .order("visited_at", { ascending: false });
+    if (data) setVisits(data);
+  }, [teacherId, getDateRange]);
+
+  useEffect(() => {
+    fetchVisits();
+  }, [fetchVisits]);
+
+  const navigate = (dir: number) => {
+    const d = new Date(currentDate);
+    if (viewMode === "daily") d.setDate(d.getDate() + dir);
+    else if (viewMode === "weekly") d.setDate(d.getDate() + dir * 7);
+    else d.setMonth(d.getMonth() + dir);
+    setCurrentDate(d);
+  };
+
+  const getDateLabel = () => {
+    if (viewMode === "daily") return format(currentDate, "yyyy년 M월 d일 (EEE)", { locale: ko });
+    if (viewMode === "weekly") {
+      const { start, end } = getDateRange();
+      return `${format(start, "M/d", { locale: ko })} ~ ${format(end, "M/d", { locale: ko })}`;
+    }
+    return format(currentDate, "yyyy년 M월", { locale: ko });
+  };
+
+  const handleExport = () => {
+    const rows = visits.map((v) => ({
+      날짜: format(new Date(v.visited_at), "yyyy-MM-dd"),
+      시간: format(new Date(v.visited_at), "HH:mm"),
+      학년: v.student_grade,
+      반: v.student_class,
+      번호: v.student_number,
+      이름: v.student_name,
+      유형: v.visit_type === "self_treatment" ? "스스로 치료" : "보건선생님",
+      "스스로 치료 항목": v.self_treatment_item || "",
+      건강문제: v.health_issue || "",
+      "처치 및 조치": v.treatment || "",
+      투약내용: v.medication || "",
+      상태: v.status === "completed" ? "완료" : "진행중",
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "보건일지");
+
+    // Auto-width columns
+    const colWidths = Object.keys(rows[0] || {}).map((key) => ({
+      wch: Math.max(key.length * 2, ...rows.map((r) => String((r as any)[key]).length * 1.5)),
+    }));
+    ws["!cols"] = colWidths;
+
+    XLSX.writeFile(wb, `보건일지_${format(currentDate, "yyyyMMdd")}.xlsx`);
+    toast.success("엑셀 파일이 다운로드되었습니다.");
+  };
+
+  const toast = { success: (msg: string) => import("sonner").then((m) => m.toast.success(msg)) };
+
+  return (
+    <div className="space-y-6">
+      <div className="rounded-2xl border bg-card p-6 shadow-sm">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+          <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
+            <Calendar className="h-5 w-5 text-primary" />
+            보건일지
+          </h2>
+
+          <div className="flex items-center gap-2">
+            {(["daily", "weekly", "monthly"] as ViewMode[]).map((mode) => (
+              <Button
+                key={mode}
+                size="sm"
+                variant={viewMode === mode ? "default" : "outline"}
+                onClick={() => setViewMode(mode)}
+              >
+                {{ daily: "일별", weekly: "주별", monthly: "월별" }[mode]}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* Date navigation */}
+        <div className="mb-6 flex items-center justify-between">
+          <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <span className="text-sm font-medium text-foreground">{getDateLabel()}</span>
+          <Button variant="ghost" size="sm" onClick={() => navigate(1)}>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Stats */}
+        <div className="mb-6 grid grid-cols-3 gap-3">
+          <div className="rounded-xl bg-accent p-4 text-center">
+            <p className="text-2xl font-bold text-primary">{visits.length}</p>
+            <p className="text-xs text-muted-foreground">전체</p>
+          </div>
+          <div className="rounded-xl bg-accent p-4 text-center">
+            <p className="text-2xl font-bold text-primary">
+              {visits.filter((v) => v.visit_type === "teacher_visit").length}
+            </p>
+            <p className="text-xs text-muted-foreground">보건선생님</p>
+          </div>
+          <div className="rounded-xl bg-accent p-4 text-center">
+            <p className="text-2xl font-bold text-primary">
+              {visits.filter((v) => v.visit_type === "self_treatment").length}
+            </p>
+            <p className="text-xs text-muted-foreground">스스로 치료</p>
+          </div>
+        </div>
+
+        {/* Export */}
+        <div className="mb-4">
+          <Button variant="outline" size="sm" className="gap-2" onClick={handleExport} disabled={visits.length === 0}>
+            <Download className="h-4 w-4" />
+            엑셀 다운로드
+          </Button>
+        </div>
+
+        {/* Table */}
+        {visits.length === 0 ? (
+          <p className="py-12 text-center text-muted-foreground">해당 기간에 기록이 없습니다.</p>
+        ) : (
+          <div className="overflow-x-auto rounded-xl border">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b bg-muted/50">
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">시간</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">학생</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">유형</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">건강문제</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">처치</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">투약</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visits.map((v) => (
+                  <tr key={v.id} className="border-b last:border-0">
+                    <td className="whitespace-nowrap px-3 py-2 text-foreground">
+                      {format(new Date(v.visited_at), "M/d HH:mm")}
+                    </td>
+                    <td className="px-3 py-2">
+                      <span className="font-medium text-foreground">{v.student_name}</span>
+                      <span className="ml-1 text-xs text-muted-foreground">
+                        {v.student_grade}-{v.student_class}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2">
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                          v.visit_type === "self_treatment"
+                            ? "bg-accent text-accent-foreground"
+                            : "bg-primary/10 text-primary"
+                        }`}
+                      >
+                        {v.visit_type === "self_treatment" ? v.self_treatment_item || "스스로" : "선생님"}
+                      </span>
+                    </td>
+                    <td className="max-w-[150px] truncate px-3 py-2 text-foreground">{v.health_issue || "-"}</td>
+                    <td className="max-w-[150px] truncate px-3 py-2 text-foreground">{v.treatment || "-"}</td>
+                    <td className="max-w-[100px] truncate px-3 py-2 text-foreground">{v.medication || "-"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
