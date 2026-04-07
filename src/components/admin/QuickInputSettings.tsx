@@ -45,6 +45,11 @@ export default function QuickInputSettings({ open, onClose, teacherId, presets, 
   };
 
   const addExtraPreset = () => {
+    const extraCount = localPresets.filter((p) => p.slot_number > 8).length;
+    if (extraCount >= 9) {
+      toast.error("빠른 입력 추가는 최대 9개까지 가능합니다.");
+      return;
+    }
     const maxSlot = localPresets.reduce((max, p) => Math.max(max, p.slot_number), 0);
     setLocalPresets((prev) => [
       ...prev,
