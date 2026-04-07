@@ -49,7 +49,7 @@ export type Database = {
           medication: string | null
           self_treatment_item: string | null
           status: string
-          student_class: number
+          student_class: string
           student_grade: number
           student_name: string
           student_number: number
@@ -66,7 +66,7 @@ export type Database = {
           medication?: string | null
           self_treatment_item?: string | null
           status?: string
-          student_class: number
+          student_class: string
           student_grade: number
           student_name: string
           student_number: number
@@ -83,7 +83,7 @@ export type Database = {
           medication?: string | null
           self_treatment_item?: string | null
           status?: string
-          student_class?: number
+          student_class?: string
           student_grade?: number
           student_name?: string
           student_number?: number
@@ -99,7 +99,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
-          student_class: number
+          student_class: string
           student_grade: number
           student_name: string
           student_number: number
@@ -108,7 +108,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
-          student_class: number
+          student_class: string
           student_grade: number
           student_name: string
           student_number: number
@@ -117,7 +117,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
-          student_class?: number
+          student_class?: string
           student_grade?: number
           student_name?: string
           student_number?: number
