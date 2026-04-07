@@ -106,65 +106,91 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, teacher
           </DialogHeader>
 
           {/* Quick Input Buttons */}
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {Array.from({ length: 8 }, (_, i) => i + 1).map((slot) => {
-              const preset = presets.find((p) => p.slot_number === slot);
-              const hasContent = preset && (preset.health_issue || preset.treatment || preset.medication);
-              return (
-                <Button
-                  key={slot}
-                  variant={hasContent ? "secondary" : "outline"}
-                  size="sm"
-                  className="h-7 px-2 text-xs"
-                  onClick={() => applyPreset(slot)}
-                  title={preset?.label || `F${slot}`}
-                >
-                  <span className="font-mono mr-1 opacity-60">F{slot}</span>
-                  {preset?.label ? (
-                    <span className="max-w-[4rem] truncate">{preset.label}</span>
-                  ) : null}
-                </Button>
-              );
-            })}
-            {/* +더보기 버튼 */}
-            {presets.filter((p) => p.slot_number > 8).length > 0 && (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
-                    +더보기 <ChevronDown className="h-3 w-3 ml-0.5" />
+          <div className="space-y-1">
+            {/* Row 1: F1~F4 + 더보기 + 설정 */}
+            <div className="flex items-center gap-1.5">
+              {Array.from({ length: 4 }, (_, i) => i + 1).map((slot) => {
+                const preset = presets.find((p) => p.slot_number === slot);
+                const hasContent = preset && (preset.health_issue || preset.treatment || preset.medication);
+                return (
+                  <Button
+                    key={slot}
+                    variant={hasContent ? "secondary" : "outline"}
+                    size="sm"
+                    className="h-7 px-2 text-xs"
+                    onClick={() => applyPreset(slot)}
+                    title={preset?.label || `F${slot}`}
+                  >
+                    <span className="font-mono mr-1 opacity-60">F{slot}</span>
+                    {preset?.label ? (
+                      <span className="max-w-[4rem] truncate">{preset.label}</span>
+                    ) : null}
                   </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-64 p-2 pointer-events-auto" align="start">
-                  <div className="space-y-1 max-h-48 overflow-y-auto">
-                    {presets
-                      .filter((p) => p.slot_number > 8)
-                      .map((preset) => (
-                        <Button
-                          key={preset.slot_number}
-                          variant="ghost"
-                          size="sm"
-                          className="w-full justify-start h-8 text-xs"
-                          onClick={() => applyPreset(preset.slot_number)}
-                        >
-                          <span className="font-semibold mr-2">{preset.label || `#${preset.slot_number}`}</span>
-                          <span className="text-muted-foreground truncate">
-                            {preset.health_issue || preset.treatment || ""}
-                          </span>
-                        </Button>
-                      ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 w-7 p-0 ml-auto"
-              onClick={() => setSettingsOpen(true)}
-              title="빠른 입력 설정"
-            >
-              <Settings className="h-4 w-4" />
-            </Button>
+                );
+              })}
+              <div className="ml-auto flex items-center gap-1.5">
+                {presets.filter((p) => p.slot_number > 8).length > 0 && (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
+                        +더보기 <ChevronDown className="h-3 w-3 ml-0.5" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-64 p-2 pointer-events-auto" align="end">
+                      <div className="space-y-1 max-h-48 overflow-y-auto">
+                        {presets
+                          .filter((p) => p.slot_number > 8)
+                          .map((preset) => (
+                            <Button
+                              key={preset.slot_number}
+                              variant="ghost"
+                              size="sm"
+                              className="w-full justify-start h-8 text-xs"
+                              onClick={() => applyPreset(preset.slot_number)}
+                            >
+                              <span className="font-semibold mr-2">{preset.label || `#${preset.slot_number}`}</span>
+                              <span className="text-muted-foreground truncate">
+                                {preset.health_issue || preset.treatment || ""}
+                              </span>
+                            </Button>
+                          ))}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0"
+                  onClick={() => setSettingsOpen(true)}
+                  title="빠른 입력 설정"
+                >
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            {/* Row 2: F5~F8 */}
+            <div className="flex items-center gap-1.5">
+              {Array.from({ length: 4 }, (_, i) => i + 5).map((slot) => {
+                const preset = presets.find((p) => p.slot_number === slot);
+                const hasContent = preset && (preset.health_issue || preset.treatment || preset.medication);
+                return (
+                  <Button
+                    key={slot}
+                    variant={hasContent ? "secondary" : "outline"}
+                    size="sm"
+                    className="h-7 px-2 text-xs"
+                    onClick={() => applyPreset(slot)}
+                    title={preset?.label || `F${slot}`}
+                  >
+                    <span className="font-mono mr-1 opacity-60">F{slot}</span>
+                    {preset?.label ? (
+                      <span className="max-w-[4rem] truncate">{preset.label}</span>
+                    ) : null}
+                  </Button>
+                );
+              })}
+            </div>
           </div>
 
           <div className="space-y-4">
