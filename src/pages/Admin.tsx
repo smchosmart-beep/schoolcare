@@ -11,6 +11,7 @@ import AdminDashboard from "@/components/admin/AdminDashboard";
 import SelfTreatmentSettings from "@/components/admin/SelfTreatmentSettings";
 import StudentUpload from "@/components/admin/StudentUpload";
 import HealthJournal from "@/components/admin/HealthJournal";
+import VisitStatistics from "@/components/admin/VisitStatistics";
 
 export default function Admin() {
   const { user, loading, signOut } = useAuth();
