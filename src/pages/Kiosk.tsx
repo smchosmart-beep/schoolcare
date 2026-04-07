@@ -91,7 +91,7 @@ export default function Kiosk() {
     setStep("selectClass");
   };
 
-  const handleClass = (cls: number) => {
+  const handleClass = (cls: string) => {
     setSelectedClass(cls);
     setStep("selectStudent");
   };
