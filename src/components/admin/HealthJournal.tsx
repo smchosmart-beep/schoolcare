@@ -100,6 +100,9 @@ export default function HealthJournal({ teacherId }: Props) {
     const colWidths = Object.keys(rows[0]).map((key) => ({
       wch: Math.max(key.length * 2, ...rows.map((r) => String(r[key]).length * 1.5)),
     }));
+    if (colWidths[5]) colWidths[5].wch = Math.max(colWidths[5].wch, 7);
+    if (colWidths[6]) colWidths[6].wch = Math.max(colWidths[6].wch, 15);
+    if (colWidths[7]) colWidths[7].wch = Math.max(colWidths[7].wch, 25);
     ws["!cols"] = colWidths;
   };
 
