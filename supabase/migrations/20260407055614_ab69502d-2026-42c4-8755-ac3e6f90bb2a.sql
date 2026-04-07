@@ -1,0 +1,1 @@
+ALTER TABLE public.visits ADD COLUMN temperature text DEFAULT NULL;
