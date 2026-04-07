@@ -1,19 +1,35 @@
 
 
-# 키오스크 모드 새창 반복 열림 문제 수정
+# 키오스크 모드 "관리자 페이지에서 시작해주세요" 문제 수정
 
-## 문제 원인
-`Admin.tsx`의 `handleKioskMode`에서 `window.open("/kiosk", "_blank")`를 사용하여 클릭할 때마다 새 탭이 계속 생성됩니다.
+## 원인
+Lovable 미리보기 환경에서 `window.open`으로 새 탭을 열면 **다른 origin**으로 열릴 수 있어서 `localStorage`가 공유되지 않습니다. Admin에서 `localStorage.setItem("kiosk-teacher-id", user.id)`를 설정해도 Kiosk 탭에서 읽을 수 없습니다.
 
-## 수정 방안
+## 해결 방안
+`window.open` 대신 **URL 파라미터**로 `teacherId`를 전달합니다. Kiosk 페이지에서 URL에 `teacherId`가 있으면 그 값을 사용하고, 없으면 `localStorage` fallback.
 
-### `src/pages/Admin.tsx` — `handleKioskMode` 수정
-- `window.open("/kiosk", "_blank")` → `window.open("/kiosk", "kiosk-window")` (named window로 변경하여 같은 창 재사용)
-- 또는 더 나은 UX: 버튼 클릭 시 `navigate("/kiosk")`로 같은 탭에서 이동하고, 관리 페이지로 돌아오는 버튼을 키오스크에 추가
+### 변경 파일
 
-### `src/pages/Kiosk.tsx` — 안내 메시지 개선
-- `teacherId`가 없을 때 단순 안내 대신 로그인 페이지로 리다이렉트하거나, 관리자 페이지 링크를 제공
+**1. `src/pages/Admin.tsx`** — `handleKioskMode` 수정
+```typescript
+const handleKioskMode = () => {
+  if (user) {
+    localStorage.setItem("kiosk-teacher-id", user.id);
+    window.open(`/kiosk?teacher=${user.id}`, "kiosk-window");
+  }
+};
+```
 
-## 권장: named window 방식
-가장 간단한 수정은 `window.open("/kiosk", "kiosk-window")`로 변경하여 동일 창을 재사용하는 것입니다. 키오스크는 태블릿에서 별도 탭으로 열리는 것이 적합하므로 `window.open` 유지하되 이름을 지정합니다.
+**2. `src/pages/Kiosk.tsx`** — URL 파라미터에서 teacherId 읽기
+```typescript
+// URL 파라미터 우선, localStorage fallback
+const params = new URLSearchParams(window.location.search);
+const teacherParam = params.get("teacher");
+if (teacherParam) {
+  localStorage.setItem("kiosk-teacher-id", teacherParam);
+}
+const teacherId = localStorage.getItem("kiosk-teacher-id") || "";
+```
+
+이렇게 하면 새 탭이 열릴 때 URL에 teacher ID가 포함되어 localStorage 공유 문제를 우회합니다.
 
