@@ -182,7 +182,7 @@ className="h-7 w-[6.5rem] px-1 text-xs"
               <Button
                 variant="ghost"
                 size="sm"
-                className="ml-auto h-7 px-2 text-xs text-muted-foreground"
+                className="ml-auto flex-1 h-7 px-2 text-xs text-muted-foreground"
                 onClick={() => setSettingsOpen(true)}
               >
                 <Settings className="h-3.5 w-3.5 mr-1" />
