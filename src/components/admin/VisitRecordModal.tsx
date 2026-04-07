@@ -157,17 +157,8 @@ className="h-7 w-[6.5rem] px-1 text-xs"
                   </PopoverContent>
                 </Popover>
               )}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="ml-auto h-7 w-7 p-0"
-                onClick={() => setSettingsOpen(true)}
-                title="빠른 입력 설정"
-              >
-                <Settings className="h-4 w-4" />
-              </Button>
             </div>
-            {/* Row 2: F5~F8 */}
+            {/* Row 2: F5~F8 + 설정 버튼 */}
             <div className="flex items-center gap-1.5">
               {Array.from({ length: 4 }, (_, i) => i + 5).map((slot) => {
                 const preset = presets.find((p) => p.slot_number === slot);
@@ -177,9 +168,9 @@ className="h-7 w-[6.5rem] px-1 text-xs"
                     key={slot}
                     variant={hasContent ? "secondary" : "outline"}
                     size="sm"
-className="h-7 w-[6.5rem] px-1 text-xs"
-                     onClick={() => applyPreset(slot)}
-                     title={preset?.label || `F${slot}`}
+                    className="h-7 w-[6.5rem] px-1 text-xs"
+                    onClick={() => applyPreset(slot)}
+                    title={preset?.label || `F${slot}`}
                   >
                     <span className="font-mono mr-1 opacity-60">F{slot}</span>
                     {preset?.label ? (
@@ -188,6 +179,15 @@ className="h-7 w-[6.5rem] px-1 text-xs"
                   </Button>
                 );
               })}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="ml-auto h-7 px-2 text-xs text-muted-foreground"
+                onClick={() => setSettingsOpen(true)}
+              >
+                <Settings className="h-3.5 w-3.5 mr-1" />
+                빠른 입력 설정
+              </Button>
             </div>
           </div>
 
