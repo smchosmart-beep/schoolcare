@@ -5,7 +5,11 @@ import { toast } from "sonner";
 import { Upload, FileSpreadsheet, Trash2, Users } from "lucide-react";
 import * as XLSX from "xlsx";
 
-export default function StudentUpload() {
+interface StudentUploadProps {
+  onUploadComplete?: () => void;
+}
+
+export default function StudentUpload({ onUploadComplete }: StudentUploadProps = {}) {
   const [students, setStudents] = useState<Student[]>(loadStudents());
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -55,6 +59,7 @@ export default function StudentUpload() {
         saveStudents(parsed);
         setStudents(parsed);
         toast.success(`${parsed.length}명의 학생 명단을 저장했습니다.`);
+        onUploadComplete?.();
       } catch {
         toast.error("파일을 읽는 중 오류가 발생했습니다.");
       }

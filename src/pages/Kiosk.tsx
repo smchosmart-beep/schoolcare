@@ -1,8 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { loadStudents, saveStudents, getGrades, getClasses, getStudentsInClass, type Student } from "@/lib/students";
+import { loadStudents, getGrades, getClasses, getStudentsInClass, type Student } from "@/lib/students";
 import { toast } from "sonner";
-import { Heart, Stethoscope, ArrowLeft, Users, Clock } from "lucide-react";
+import { Heart, Stethoscope, ArrowLeft, Users, Clock, Settings } from "lucide-react";
+import StudentUpload from "@/components/admin/StudentUpload";
 
 type KioskStep = "home" | "selectGrade" | "selectClass" | "selectStudent" | "selfTreatment";
 type VisitType = "self_treatment" | "teacher_visit";
@@ -23,6 +26,8 @@ interface TreatmentOption {
 }
 
 export default function Kiosk() {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
   const [step, setStep] = useState<KioskStep>("home");
   const [visitType, setVisitType] = useState<VisitType>("self_treatment");
   const [selectedGrade, setSelectedGrade] = useState<number>(0);
@@ -32,28 +37,16 @@ export default function Kiosk() {
   const [treatmentOptions, setTreatmentOptions] = useState<TreatmentOption[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
 
-  // URL 파라미터 우선, localStorage fallback
-  const params = new URLSearchParams(window.location.search);
-  const teacherParam = params.get("teacher");
-  if (teacherParam) {
-    localStorage.setItem("kiosk-teacher-id", teacherParam);
-  }
-  const teacherId = teacherParam || localStorage.getItem("kiosk-teacher-id") || "";
+  const teacherId = user?.id || "";
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate("/login");
+    }
+  }, [user, loading, navigate]);
 
   useEffect(() => {
     setStudents(loadStudents());
-  }, []);
-
-  // postMessage로 학생 데이터 수신
-  useEffect(() => {
-    const handler = (e: MessageEvent) => {
-      if (e.data?.type === "STUDENT_DATA" && Array.isArray(e.data.students)) {
-        saveStudents(e.data.students);
-        setStudents(e.data.students);
-      }
-    };
-    window.addEventListener("message", handler);
-    return () => window.removeEventListener("message", handler);
   }, []);
 
   // Fetch queue
@@ -166,13 +159,44 @@ export default function Kiosk() {
     }
   };
 
-  if (!teacherId) {
+  if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background p-8">
-        <div className="text-center space-y-4">
-          <Heart className="h-16 w-16 text-primary mx-auto" />
-          <h1 className="text-2xl font-bold text-foreground">키오스크 모드</h1>
-          <p className="text-muted-foreground">관리자 페이지에서 키오스크 모드를 시작해주세요.</p>
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="animate-pulse text-primary">
+          <Heart className="h-12 w-12" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) return null;
+
+  // 학생 명단이 없으면 업로드 UI 표시
+  if (students.length === 0) {
+    return (
+      <div className="flex min-h-screen flex-col bg-background">
+        <header className="flex items-center justify-between border-b bg-primary px-6 py-4">
+          <div className="flex items-center gap-3">
+            <Heart className="h-8 w-8 text-primary-foreground" />
+            <h1 className="text-xl font-bold text-primary-foreground">보건실 키오스크</h1>
+          </div>
+          <button
+            onClick={() => navigate("/admin")}
+            className="flex items-center gap-2 rounded-lg bg-primary-foreground/20 px-3 py-2 text-sm text-primary-foreground hover:bg-primary-foreground/30"
+          >
+            <Settings className="h-4 w-4" />
+            관리자 페이지
+          </button>
+        </header>
+        <div className="mx-auto w-full max-w-2xl p-6">
+          <div className="mb-6 rounded-2xl border border-primary/20 bg-accent p-6 text-center">
+            <Heart className="mx-auto mb-3 h-12 w-12 text-primary" />
+            <h2 className="text-xl font-bold text-foreground">학생 명단을 먼저 업로드해주세요</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              키오스크를 사용하려면 이 기기에 학생 명단이 필요합니다.
+            </p>
+          </div>
+          <StudentUpload onUploadComplete={() => setStudents(loadStudents())} />
         </div>
       </div>
     );
@@ -188,9 +212,18 @@ export default function Kiosk() {
             <Heart className="h-8 w-8 text-primary-foreground" />
             <h1 className="text-xl font-bold text-primary-foreground">보건실</h1>
           </div>
-          <div className="flex items-center gap-2 rounded-full bg-primary-foreground/20 px-4 py-2">
-            <Users className="h-5 w-5 text-primary-foreground" />
-            <span className="text-lg font-semibold text-primary-foreground">대기 {queue.length}명</span>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 rounded-full bg-primary-foreground/20 px-4 py-2">
+              <Users className="h-5 w-5 text-primary-foreground" />
+              <span className="text-lg font-semibold text-primary-foreground">대기 {queue.length}명</span>
+            </div>
+            <button
+              onClick={() => navigate("/admin")}
+              className="rounded-lg bg-primary-foreground/20 p-2 text-primary-foreground hover:bg-primary-foreground/30"
+              title="관리자 페이지"
+            >
+              <Settings className="h-5 w-5" />
+            </button>
           </div>
         </header>
 
