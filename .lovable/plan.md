@@ -1,37 +1,21 @@
 
 
-# 키오스크 학생 명단 — 각 기기에서 독립 업로드
+# 키오스크 인증 + 학생 명단 업로드 기능 추가
 
-## 현재 상황
-- 키오스크(태블릿)에서 학생이 "스스로 치료" / "보건 선생님 만나기" 선택 → 학년/반/이름 선택 → DB에 기록
-- 보건교사 PC(Admin)에서 DB의 방문 기록을 보고 보건일지 작성
-- **DB를 통해 두 기기가 연동**됨 (독립이 아님)
-- 문제: 학생 명단만 localStorage에 있어서 키오스크 기기에서 못 읽음
+## 변경 파일
 
-## 해결 방안
-키오스크 페이지에도 학생 명단 업로드 기능을 넣어서, 태블릿에서도 최초 1회 업로드하면 됩니다. 두 기기 모두 같은 계정으로 로그인하고, 각각의 localStorage에 학생 명단을 갖고 있으면 됩니다.
-
-## 변경 사항
-
-### 1. `src/pages/Kiosk.tsx` — 인증 추가 + 학생 명단 없을 때 업로드 UI
-- `useAuth()` 훅으로 로그인 상태 확인, 미로그인 시 `/login`으로 리다이렉트
+### 1. `src/pages/Kiosk.tsx`
+- `useAuth()` 훅 추가, 미로그인 시 `/login`으로 리다이렉트
 - `teacherId`를 `user.id`에서 가져옴 (URL 파라미터/localStorage 로직 제거)
-- 학생 명단이 비어있으면 `StudentUpload` 컴포넌트 표시
-- `postMessage` 리스너 제거
+- `postMessage` 리스너 제거 (47~57줄)
+- 학생 명단이 비어있으면 `StudentUpload` 컴포넌트 표시 + "학생 명단을 먼저 업로드해주세요" 안내
+- 홈 화면 헤더에 작은 "관리자 페이지" 버튼 추가 (보건교사가 같은 기기에서 전환 가능)
+- 학생 업로드 완료 후 students state 갱신되도록 콜백 처리
 
-### 2. `src/pages/Admin.tsx` — handleKioskMode 단순화
-- `window.open`, `postMessage`, `loadStudents` 관련 코드 제거
-- 키오스크 버튼 클릭 시 `navigate("/kiosk")`로 같은 탭 이동 (또는 안내 메시지: "태블릿에서 로그인 후 사용하세요")
+### 2. `src/pages/Admin.tsx`
+- `handleKioskMode`에서 `window.open`, `postMessage`, `loadStudents` 관련 코드 제거
+- `navigate("/kiosk")`로 단순 이동
 
-### 3. `src/pages/Kiosk.tsx` — 관리자 페이지 이동 버튼
-- 화면 구석에 작은 "관리자 페이지" 버튼 추가 (보건교사가 같은 기기에서 전환 가능)
-
-## 운영 흐름
-```text
-[태블릿 - 키오스크]              [PC - 관리자]
-로그인 → 학생 명단 업로드(1회)    로그인 → 학생 명단 업로드(1회)
-    ↓                              ↓
-학생이 방문 등록 → DB 저장    ←→  DB에서 방문 기록 조회
-                                   보건일지 작성
-```
+### 3. `src/components/admin/StudentUpload.tsx`
+- 업로드 완료 시 외부에 알릴 수 있도록 `onUploadComplete?: () => void` prop 추가 (키오스크에서 사용)
 
