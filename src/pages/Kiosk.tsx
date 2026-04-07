@@ -44,6 +44,18 @@ export default function Kiosk() {
     setStudents(loadStudents());
   }, []);
 
+  // postMessage로 학생 데이터 수신
+  useEffect(() => {
+    const handler = (e: MessageEvent) => {
+      if (e.data?.type === "STUDENT_DATA" && Array.isArray(e.data.students)) {
+        saveStudents(e.data.students);
+        setStudents(e.data.students);
+      }
+    };
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
+  }, []);
+
   // Fetch queue
   const fetchQueue = useCallback(async () => {
     if (!teacherId) return;
