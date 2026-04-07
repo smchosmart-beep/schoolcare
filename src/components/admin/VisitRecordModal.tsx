@@ -117,9 +117,9 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, teacher
                     key={slot}
                     variant={hasContent ? "secondary" : "outline"}
                     size="sm"
-                    className="h-7 w-[5.5rem] px-1 text-xs"
-                    onClick={() => applyPreset(slot)}
-                    title={preset?.label || `F${slot}`}
+className="h-7 w-[6.5rem] px-1 text-xs"
+                     onClick={() => applyPreset(slot)}
+                     title={preset?.label || `F${slot}`}
                   >
                     <span className="font-mono mr-1 opacity-60">F{slot}</span>
                     {preset?.label ? (
