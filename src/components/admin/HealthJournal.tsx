@@ -41,7 +41,7 @@ export default function HealthJournal({ teacherId }: Props) {
       end.setHours(23, 59, 59, 999);
       return { start, end };
     } else if (viewMode === "weekly") {
-      return { start: startOfWeek(currentDate, { locale: ko }), end: endOfWeek(currentDate, { locale: ko }) };
+      return { start: startOfWeek(currentDate, { weekStartsOn: 1 }), end: endOfWeek(currentDate, { weekStartsOn: 1 }) };
     } else {
       return { start: startOfMonth(currentDate), end: endOfMonth(currentDate) };
     }
