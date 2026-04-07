@@ -136,7 +136,7 @@ export default function Kiosk() {
   const resetToHome = () => {
     setStep("home");
     setSelectedGrade(0);
-    setSelectedClass(0);
+    setSelectedClass("");
     setSelectedStudent(null);
   };
 
