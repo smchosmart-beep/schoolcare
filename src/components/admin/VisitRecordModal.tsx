@@ -135,7 +135,7 @@ className="h-7 w-[6.5rem] px-1 text-xs"
                       +더보기 <ChevronDown className="h-3 w-3 ml-0.5" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-64 p-2 pointer-events-auto" align="end">
+                  <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-2 pointer-events-auto" align="start">
                     <div className="space-y-1 max-h-48 overflow-y-auto">
                       {presets
                         .filter((p) => p.slot_number > 8)
