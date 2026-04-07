@@ -142,7 +142,7 @@ className="h-7 w-[6.5rem] px-1 text-xs"
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button variant="outline" size="sm" className="h-7 flex-1 px-2 text-xs">
-                      +더보기 <ChevronDown className="h-3 w-3 ml-0.5" />
+                      빠른 입력 추가 <ChevronDown className="h-3 w-3 ml-0.5" />
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-2 pointer-events-auto" align="start">
