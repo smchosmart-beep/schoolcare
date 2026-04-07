@@ -11,7 +11,7 @@ interface Visit {
   id: string;
   student_name: string;
   student_grade: number;
-  student_class: number;
+  student_class: string;
   student_number: number;
   visit_type: string;
   self_treatment_item: string | null;

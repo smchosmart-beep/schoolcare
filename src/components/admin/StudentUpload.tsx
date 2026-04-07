@@ -39,10 +39,10 @@ export default function StudentUpload() {
           const row = rows[i];
           if (!row || !row[nameIdx]) continue;
           const grade = parseInt(String(row[gradeIdx]));
-          const cls = parseInt(String(row[classIdx]));
+          const cls = String(row[classIdx]).trim();
           const num = parseInt(String(row[numberIdx]));
           const name = String(row[nameIdx]).trim();
-          if (!isNaN(grade) && !isNaN(cls) && !isNaN(num) && name) {
+          if (!isNaN(grade) && cls && !isNaN(num) && name) {
             parsed.push({ grade, class: cls, number: num, name });
           }
         }
@@ -123,7 +123,7 @@ export default function StudentUpload() {
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {grades.map((g) => {
               const gradeStudents = students.filter((s) => s.grade === g);
-              const classes = [...new Set(gradeStudents.map((s) => s.class))].sort((a, b) => a - b);
+              const classes = [...new Set(gradeStudents.map((s) => s.class))].sort((a, b) => a.localeCompare(b));
               return (
                 <div key={g} className="rounded-xl border bg-background p-4">
                   <p className="mb-2 font-semibold text-foreground">{g}학년</p>

@@ -1,6 +1,6 @@
 export interface Student {
   grade: number;
-  class: number;
+  class: string;
   number: number;
   name: string;
 }
@@ -20,11 +20,11 @@ export function getGrades(students: Student[]): number[] {
   return [...new Set(students.map((s) => s.grade))].sort((a, b) => a - b);
 }
 
-export function getClasses(students: Student[], grade: number): number[] {
-  return [...new Set(students.filter((s) => s.grade === grade).map((s) => s.class))].sort((a, b) => a - b);
+export function getClasses(students: Student[], grade: number): string[] {
+  return [...new Set(students.filter((s) => s.grade === grade).map((s) => s.class))].sort((a, b) => a.localeCompare(b));
 }
 
-export function getStudentsInClass(students: Student[], grade: number, cls: number): Student[] {
+export function getStudentsInClass(students: Student[], grade: number, cls: string): Student[] {
   return students
     .filter((s) => s.grade === grade && s.class === cls)
     .sort((a, b) => a.number - b.number);

@@ -11,7 +11,7 @@ interface QueueItem {
   id: string;
   student_name: string;
   student_grade: number;
-  student_class: number;
+  student_class: string;
   student_number: number;
   created_at: string;
 }
@@ -26,7 +26,7 @@ export default function Kiosk() {
   const [step, setStep] = useState<KioskStep>("home");
   const [visitType, setVisitType] = useState<VisitType>("self_treatment");
   const [selectedGrade, setSelectedGrade] = useState<number>(0);
-  const [selectedClass, setSelectedClass] = useState<number>(0);
+  const [selectedClass, setSelectedClass] = useState<string>("");
   const [students, setStudents] = useState<Student[]>([]);
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [treatmentOptions, setTreatmentOptions] = useState<TreatmentOption[]>([]);
@@ -91,7 +91,7 @@ export default function Kiosk() {
     setStep("selectClass");
   };
 
-  const handleClass = (cls: number) => {
+  const handleClass = (cls: string) => {
     setSelectedClass(cls);
     setStep("selectStudent");
   };
@@ -136,7 +136,7 @@ export default function Kiosk() {
   const resetToHome = () => {
     setStep("home");
     setSelectedGrade(0);
-    setSelectedClass(0);
+    setSelectedClass("");
     setSelectedStudent(null);
   };
 
