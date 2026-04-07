@@ -1,35 +1,54 @@
 
 
-# 키오스크 모드 "관리자 페이지에서 시작해주세요" 문제 수정
+# 키오스크 학생 명단 안 보이는 문제 수정
 
 ## 원인
-Lovable 미리보기 환경에서 `window.open`으로 새 탭을 열면 **다른 origin**으로 열릴 수 있어서 `localStorage`가 공유되지 않습니다. Admin에서 `localStorage.setItem("kiosk-teacher-id", user.id)`를 설정해도 Kiosk 탭에서 읽을 수 없습니다.
+Admin 페이지에서 학생 명단을 localStorage에 저장하지만, 키오스크는 `window.open`으로 새 탭/창에서 열립니다. Lovable 미리보기 환경에서는 origin이 달라 **localStorage가 공유되지 않습니다.** 따라서 키오스크에서 `loadStudents()`를 호출해도 빈 배열이 반환됩니다.
 
 ## 해결 방안
-`window.open` 대신 **URL 파라미터**로 `teacherId`를 전달합니다. Kiosk 페이지에서 URL에 `teacherId`가 있으면 그 값을 사용하고, 없으면 `localStorage` fallback.
+키오스크 창을 열 때 Admin 페이지의 localStorage에서 학생 데이터를 **URL hash 또는 postMessage**로 전달합니다. 학생 데이터가 클 수 있으므로 `postMessage` 방식이 적합합니다.
 
-### 변경 파일
+### 변경 사항
 
-**1. `src/pages/Admin.tsx`** — `handleKioskMode` 수정
+**1. `src/pages/Admin.tsx`** — 키오스크 창 열고 학생 데이터 전송
+- `window.open` 후 반환된 window 참조를 저장
+- 키오스크 창이 로드되면 `postMessage`로 학생 데이터 전송
 ```typescript
 const handleKioskMode = () => {
   if (user) {
     localStorage.setItem("kiosk-teacher-id", user.id);
-    window.open(`/kiosk?teacher=${user.id}`, "kiosk-window");
+    const kioskWindow = window.open(`/kiosk?teacher=${user.id}`, "kiosk-window");
+    // 키오스크 창이 로드되면 학생 데이터 전송
+    if (kioskWindow) {
+      const sendStudents = () => {
+        const students = loadStudents();
+        kioskWindow.postMessage({ type: "STUDENT_DATA", students }, "*");
+      };
+      // 약간의 딜레이 후 전송 (창 로드 대기)
+      setTimeout(sendStudents, 1500);
+      setTimeout(sendStudents, 3000);
+    }
   }
 };
 ```
 
-**2. `src/pages/Kiosk.tsx`** — URL 파라미터에서 teacherId 읽기
+**2. `src/pages/Kiosk.tsx`** — `message` 이벤트로 학생 데이터 수신
+- `useEffect`에서 `window.addEventListener("message", ...)` 추가
+- 수신한 학생 데이터를 키오스크의 localStorage에도 저장하고 state에 반영
 ```typescript
-// URL 파라미터 우선, localStorage fallback
-const params = new URLSearchParams(window.location.search);
-const teacherParam = params.get("teacher");
-if (teacherParam) {
-  localStorage.setItem("kiosk-teacher-id", teacherParam);
-}
-const teacherId = localStorage.getItem("kiosk-teacher-id") || "";
+useEffect(() => {
+  const handler = (e: MessageEvent) => {
+    if (e.data?.type === "STUDENT_DATA" && Array.isArray(e.data.students)) {
+      saveStudents(e.data.students);
+      setStudents(e.data.students);
+    }
+  };
+  window.addEventListener("message", handler);
+  return () => window.removeEventListener("message", handler);
+}, []);
 ```
 
-이렇게 하면 새 탭이 열릴 때 URL에 teacher ID가 포함되어 localStorage 공유 문제를 우회합니다.
+**3. `src/pages/Admin.tsx`** — `loadStudents` import 추가
+
+이렇게 하면 origin이 달라도 `postMessage`로 학생 데이터가 키오스크 창에 전달되어 학년/반/이름 선택이 정상 작동합니다.
 
