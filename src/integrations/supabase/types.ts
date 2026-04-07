@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      quick_input_presets: {
+        Row: {
+          created_at: string
+          health_issue: string
+          id: string
+          label: string
+          medication: string
+          slot_number: number
+          teacher_id: string
+          treatment: string
+        }
+        Insert: {
+          created_at?: string
+          health_issue?: string
+          id?: string
+          label?: string
+          medication?: string
+          slot_number: number
+          teacher_id: string
+          treatment?: string
+        }
+        Update: {
+          created_at?: string
+          health_issue?: string
+          id?: string
+          label?: string
+          medication?: string
+          slot_number?: number
+          teacher_id?: string
+          treatment?: string
+        }
+        Relationships: []
+      }
       self_treatment_options: {
         Row: {
           created_at: string
