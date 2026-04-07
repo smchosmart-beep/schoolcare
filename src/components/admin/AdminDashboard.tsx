@@ -9,7 +9,7 @@ interface QueueItem {
   id: string;
   student_name: string;
   student_grade: number;
-  student_class: number;
+  student_class: string;
   student_number: number;
   created_at: string;
 }
