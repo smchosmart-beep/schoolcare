@@ -1,0 +1,2 @@
+ALTER TABLE public.quick_input_presets DROP CONSTRAINT IF EXISTS quick_input_presets_slot_number_check;
+ALTER TABLE public.quick_input_presets ADD CONSTRAINT quick_input_presets_slot_number_check CHECK (slot_number >= 1);

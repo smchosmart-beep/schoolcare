@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Settings } from "lucide-react";
+import { Settings, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import QuickInputSettings, { type Preset } from "./QuickInputSettings";
 
@@ -125,6 +126,36 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, teacher
                 </Button>
               );
             })}
+            {/* +더보기 버튼 */}
+            {presets.filter((p) => p.slot_number > 8).length > 0 && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
+                    +더보기 <ChevronDown className="h-3 w-3 ml-0.5" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-64 p-2 pointer-events-auto" align="start">
+                  <div className="space-y-1 max-h-48 overflow-y-auto">
+                    {presets
+                      .filter((p) => p.slot_number > 8)
+                      .map((preset) => (
+                        <Button
+                          key={preset.slot_number}
+                          variant="ghost"
+                          size="sm"
+                          className="w-full justify-start h-8 text-xs"
+                          onClick={() => applyPreset(preset.slot_number)}
+                        >
+                          <span className="font-semibold mr-2">{preset.label || `#${preset.slot_number}`}</span>
+                          <span className="text-muted-foreground truncate">
+                            {preset.health_issue || preset.treatment || ""}
+                          </span>
+                        </Button>
+                      ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            )}
             <Button
               variant="ghost"
               size="sm"
