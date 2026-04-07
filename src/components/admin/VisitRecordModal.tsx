@@ -56,6 +56,7 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, teacher
       setHealthIssue(visit.health_issue || "");
       setTreatment(visit.treatment || "");
       setMedication(visit.medication || "");
+      setTemperature(visit.temperature || "");
     }
   }, [visit]);
 
