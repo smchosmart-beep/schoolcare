@@ -26,7 +26,7 @@ export default function Kiosk() {
   const [step, setStep] = useState<KioskStep>("home");
   const [visitType, setVisitType] = useState<VisitType>("self_treatment");
   const [selectedGrade, setSelectedGrade] = useState<number>(0);
-  const [selectedClass, setSelectedClass] = useState<number>(0);
+  const [selectedClass, setSelectedClass] = useState<string>("");
   const [students, setStudents] = useState<Student[]>([]);
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [treatmentOptions, setTreatmentOptions] = useState<TreatmentOption[]>([]);
