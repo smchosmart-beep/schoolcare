@@ -1,9 +1,9 @@
 
 
-# 모달 가로 너비 확장
+# F1~F8 버튼 가로 길이 확대
 
 ## 변경 사항
 
 ### `src/components/admin/VisitRecordModal.tsx`
-- `max-w-lg` → `max-w-2xl` 변경 (512px → 672px)
+- F1~F8 버튼의 `w-[5.5rem]` → `w-[6.5rem]` 변경 (2곳: F1~F4 줄, F5~F8 줄)
 
