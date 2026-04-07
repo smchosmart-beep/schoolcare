@@ -258,6 +258,7 @@ export default function AdminDashboard({ teacherId }: Props) {
         onClose={() => setModalOpen(false)}
         visit={selectedVisit}
         onSave={handleSaveVisit}
+        teacherId={teacherId}
       />
     </div>
   );
