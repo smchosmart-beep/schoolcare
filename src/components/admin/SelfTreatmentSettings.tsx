@@ -13,7 +13,11 @@ interface Option {
   sort_order: number;
 }
 
-const EMOJI_LIST = ["💊", "🩹", "🧊", "🌡️", "💧", "🏥", "❤️‍🩹", "🦷", "👁️", "🤧"];
+const EMOJI_LIST = [
+  "💊", "🩹", "🧊", "🌡️", "💧", "🏥", "❤️‍🩹", "🦷", "👁️", "🤧",
+  "🧴", "💉", "🩺", "🧻", "🫁", "🤕", "🤒", "😷", "🩼", "👃",
+  "🦴", "🫀", "🧽", "✋", "🦵",
+];
 
 interface Props {
   teacherId: string;
