@@ -61,10 +61,20 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, teacher
     }
   }, [visit]);
 
-  // F1~F8 keyboard shortcuts
+  // F1~F8 + Alt+1~9 keyboard shortcuts
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => {
+      // Alt+1~9 for extra presets
+      if (e.altKey && /^[1-9]$/.test(e.key)) {
+        e.preventDefault();
+        const extraPresets = presets.filter((p) => p.slot_number > 8).slice(0, 9);
+        const idx = parseInt(e.key) - 1;
+        if (extraPresets[idx]) {
+          applyPreset(extraPresets[idx].slot_number);
+        }
+        return;
+      }
       const match = e.key.match(/^F(\d)$/);
       if (!match) return;
       const num = parseInt(match[1]);
