@@ -131,7 +131,7 @@ className="h-7 w-[6.5rem] px-1 text-xs"
               {presets.filter((p) => p.slot_number > 8).length > 0 && (
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
+                    <Button variant="outline" size="sm" className="h-7 flex-1 px-2 text-xs">
                       +더보기 <ChevronDown className="h-3 w-3 ml-0.5" />
                     </Button>
                   </PopoverTrigger>
