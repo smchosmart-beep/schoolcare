@@ -1,22 +1,24 @@
 
 
-# 설정 버튼을 드롭박스 아래로 이동 + 텍스트 버튼화
+# 더보기 팝오버 너비를 버튼 너비와 동일하게
 
 ## 변경 사항
 
-### `src/components/admin/VisitRecordModal.tsx`
+### `src/components/admin/VisitRecordModal.tsx` — 138줄
 
-**현재**: 1줄에 F1~F4 + 더보기 + ⚙️ 설정 아이콘이 같이 있음
+PopoverContent의 고정 너비 `w-64`를 제거하고, 트리거 버튼 너비에 맞추도록 변경:
 
-**변경 후**:
-```text
-┌─────────────────────────────────────────────────┐
-│ [F1] [F2] [F3] [F4]     [+더보기 ▼]            │
-│ [F5] [F6] [F7] [F8]     [⚙️ 빠른 입력 설정]    │
-└─────────────────────────────────────────────────┘
+- `Popover`에 `modal={false}` 추가 (이미 있을 수 있음)
+- `PopoverContent`의 `className`에서 `w-64` 제거
+- CSS 변수 `--radix-popover-trigger-width`를 활용하여 `w-[var(--radix-popover-trigger-width)]` 적용
+
+```tsx
+// 변경 전
+<PopoverContent className="w-64 p-2 pointer-events-auto" align="end">
+
+// 변경 후
+<PopoverContent className="w-[var(--radix-popover-trigger-width)] p-2 pointer-events-auto" align="start">
 ```
 
-- 1줄(F1~F4): `ml-auto`로 있던 설정 버튼 제거, 더보기만 유지
-- 2줄(F5~F8): 오른쪽에 `ml-auto`로 `⚙️ 빠른 입력 설정` 버튼 배치
-- 설정 버튼: 아이콘만 → `Settings 아이콘 + "빠른 입력 설정"` 텍스트 포함, `variant="ghost"`, `text-xs`
+이렇게 하면 Radix가 자동으로 트리거 버튼의 너비를 CSS 변수로 전달하여, 팝오버가 버튼과 동일한 가로 너비로 열립니다.
 
