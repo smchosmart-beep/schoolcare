@@ -33,6 +33,7 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, teacher
   const [healthIssue, setHealthIssue] = useState("");
   const [treatment, setTreatment] = useState("");
   const [medication, setMedication] = useState("");
+  const [temperature, setTemperature] = useState("");
   const [presets, setPresets] = useState<Preset[]>([]);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
