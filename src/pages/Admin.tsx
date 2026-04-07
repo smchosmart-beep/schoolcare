@@ -24,7 +24,7 @@ export default function Admin() {
   const handleKioskMode = () => {
     if (user) {
       localStorage.setItem("kiosk-teacher-id", user.id);
-      window.open("/kiosk", "kiosk-window");
+      window.open(`/kiosk?teacher=${user.id}`, "kiosk-window");
     }
   };
 

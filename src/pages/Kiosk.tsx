@@ -32,8 +32,13 @@ export default function Kiosk() {
   const [treatmentOptions, setTreatmentOptions] = useState<TreatmentOption[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
 
-  // Get teacher_id from localStorage (set by admin when entering kiosk mode)
-  const teacherId = localStorage.getItem("kiosk-teacher-id") || "";
+  // URL 파라미터 우선, localStorage fallback
+  const params = new URLSearchParams(window.location.search);
+  const teacherParam = params.get("teacher");
+  if (teacherParam) {
+    localStorage.setItem("kiosk-teacher-id", teacherParam);
+  }
+  const teacherId = teacherParam || localStorage.getItem("kiosk-teacher-id") || "";
 
   useEffect(() => {
     setStudents(loadStudents());
