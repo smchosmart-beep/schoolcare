@@ -178,7 +178,7 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, teacher
             <Button variant="outline" onClick={onClose}>
               취소
             </Button>
-            <Button onClick={() => onSave({ health_issue: healthIssue, treatment, medication })}>
+            <Button onClick={() => onSave({ health_issue: healthIssue, treatment, medication, temperature })}>
               저장
             </Button>
           </DialogFooter>
