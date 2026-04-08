@@ -281,11 +281,11 @@ export default function HealthJournal({ teacherId }: Props) {
                             : "bg-primary/10 text-primary"
                         }`}
                       >
-                        {v.visit_type === "self_treatment" ? v.self_treatment_item || "스스로" : "선생님"}
+                        {v.visit_type === "self_treatment" ? "스스로" : "선생님"}
                       </span>
                     </td>
                     <td className="max-w-[150px] truncate px-3 py-2 text-foreground">{v.health_issue || "-"}</td>
-                    <td className="max-w-[150px] truncate px-3 py-2 text-foreground">{v.treatment || "-"}</td>
+                    <td className="max-w-[150px] truncate px-3 py-2 text-foreground">{v.treatment || (v.visit_type === "self_treatment" ? v.self_treatment_item : null) || "-"}</td>
                     <td className="max-w-[100px] truncate px-3 py-2 text-foreground">{v.medication || "-"}</td>
                     <td className="whitespace-nowrap px-3 py-2 text-foreground">{v.temperature || "-"}</td>
                     <td className="px-3 py-2 text-center">
