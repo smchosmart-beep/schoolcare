@@ -277,7 +277,7 @@ export default function HealthJournal({ teacherId }: Props) {
                       <span
                         className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                           v.visit_type === "self_treatment"
-                            ? "bg-accent text-accent-foreground"
+                            ? "bg-secondary/20 text-secondary-foreground"
                             : "bg-primary/10 text-primary"
                         }`}
                       >
