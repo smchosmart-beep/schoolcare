@@ -145,9 +145,39 @@ export default function HealthJournal({ teacherId }: Props) {
     toast.success("엑셀 파일이 다운로드되었습니다.");
   };
 
-  
+  const handleRowClick = (v: Visit) => {
+    setSelectedVisit(v);
+    setModalOpen(true);
+  };
 
-  return (
+  const handleSave = async (data: { health_issue: string; treatment: string; medication: string; temperature: string }) => {
+    if (!selectedVisit) return;
+    const { error } = await supabase
+      .from("visits")
+      .update(data)
+      .eq("id", selectedVisit.id);
+    if (error) {
+      toast.error("수정에 실패했습니다.");
+      return;
+    }
+    toast.success("보건일지가 수정되었습니다.");
+    setModalOpen(false);
+    setSelectedVisit(null);
+    fetchVisits();
+  };
+
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    if (!confirm("이 기록을 삭제하시겠습니까?")) return;
+    const { error } = await supabase.from("visits").delete().eq("id", id);
+    if (error) {
+      toast.error("삭제에 실패했습니다.");
+      return;
+    }
+    toast.success("기록이 삭제되었습니다.");
+    fetchVisits();
+  };
+
     <div className="space-y-6">
       <div className="rounded-2xl border bg-card p-6 shadow-sm">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
