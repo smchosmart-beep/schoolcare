@@ -88,8 +88,8 @@ export default function VisitStatistics({ teacherId }: VisitStatisticsProps) {
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap items-end gap-4">
-            <div className="space-y-2">
-              <label className="text-sm text-muted-foreground">시작일</label>
+            <div className="space-y-3">
+              <label className="block text-sm text-muted-foreground">시작일</label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className={cn("w-[160px] justify-start text-left font-normal", !startDate && "text-muted-foreground")}>
@@ -103,8 +103,8 @@ export default function VisitStatistics({ teacherId }: VisitStatisticsProps) {
               </Popover>
             </div>
             <span className="pb-2 px-2 text-muted-foreground">~</span>
-            <div className="space-y-2">
-              <label className="text-sm text-muted-foreground">종료일</label>
+            <div className="space-y-3">
+              <label className="block text-sm text-muted-foreground">종료일</label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className={cn("w-[160px] justify-start text-left font-normal", !endDate && "text-muted-foreground")}>
