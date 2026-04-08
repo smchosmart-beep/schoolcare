@@ -68,7 +68,7 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, onDelet
     setHistoryLoading(true);
     const { data } = await supabase
       .from("visits")
-      .select("id, visited_at, health_issue, treatment, temperature")
+      .select("id, visited_at, health_issue, treatment, temperature, visit_type, self_treatment_item")
       .eq("teacher_id", teacherId)
       .eq("student_grade", visit.student_grade)
       .eq("student_class", visit.student_class)
