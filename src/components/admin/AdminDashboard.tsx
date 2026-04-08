@@ -175,6 +175,10 @@ export default function AdminDashboard({ teacherId }: Props) {
         <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-foreground">
           <Clock className="h-5 w-5 text-secondary" />
           보건선생님 대기 명단
+          <Button size="sm" variant="outline" className="ml-2" onClick={() => setDirectDialogOpen(true)}>
+            <Plus className="h-4 w-4 mr-1" />
+            직접 기록
+          </Button>
           <span className="ml-auto rounded-full bg-secondary/20 px-3 py-1 text-sm font-medium text-secondary-foreground">
             {queue.length}명
           </span>
