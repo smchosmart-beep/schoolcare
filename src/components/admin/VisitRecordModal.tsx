@@ -5,8 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Settings, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
 import QuickInputSettings, { type Preset } from "./QuickInputSettings";
 
 interface Visit {
@@ -20,6 +22,14 @@ interface Visit {
   medication: string | null;
   temperature: string | null;
   visited_at: string;
+}
+
+interface HistoryRecord {
+  id: string;
+  visited_at: string;
+  health_issue: string | null;
+  treatment: string | null;
+  temperature: string | null;
 }
 
 interface Props {
@@ -38,6 +48,8 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, onDelet
   const [temperature, setTemperature] = useState("");
   const [presets, setPresets] = useState<Preset[]>([]);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [history, setHistory] = useState<HistoryRecord[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
 
   const fetchPresets = useCallback(async () => {
     if (!teacherId) return;
@@ -49,9 +61,29 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, onDelet
     if (data) setPresets(data);
   }, [teacherId]);
 
+  const fetchHistory = useCallback(async () => {
+    if (!visit || !teacherId) return;
+    setHistoryLoading(true);
+    const { data } = await supabase
+      .from("visits")
+      .select("id, visited_at, health_issue, treatment, temperature")
+      .eq("teacher_id", teacherId)
+      .eq("student_grade", visit.student_grade)
+      .eq("student_class", visit.student_class)
+      .eq("student_number", visit.student_number)
+      .neq("id", visit.id)
+      .order("visited_at", { ascending: false })
+      .limit(50);
+    setHistory(data || []);
+    setHistoryLoading(false);
+  }, [visit, teacherId]);
+
   useEffect(() => {
-    if (open) fetchPresets();
-  }, [open, fetchPresets]);
+    if (open) {
+      fetchPresets();
+      fetchHistory();
+    }
+  }, [open, fetchPresets, fetchHistory]);
 
   useEffect(() => {
     if (visit) {
@@ -66,7 +98,6 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, onDelet
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => {
-      // Alt+1~9 for extra presets
       if (e.altKey && /^[1-9]$/.test(e.key)) {
         e.preventDefault();
         const extraPresets = presets.filter((p) => p.slot_number > 8).slice(0, 9);
@@ -106,7 +137,7 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, onDelet
   return (
     <>
       <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-5xl max-h-[90vh]">
           <DialogHeader>
             <DialogTitle className="text-lg">
               {visit.student_name} ({visit.student_grade}학년 {visit.student_class}반 {visit.student_number}번)
@@ -116,130 +147,174 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, onDelet
             </p>
           </DialogHeader>
 
-          {/* Quick Input Buttons */}
-          <div className="space-y-1">
-            {/* Row 1: F1~F4 + 더보기 + 설정 */}
-            <div className="flex items-center gap-1.5">
-              {Array.from({ length: 4 }, (_, i) => i + 1).map((slot) => {
-                const preset = presets.find((p) => p.slot_number === slot);
-                const hasContent = preset && (preset.health_issue || preset.treatment || preset.medication);
-                return (
+          <div className="flex gap-6">
+            {/* Left: Form */}
+            <div className="flex-1 min-w-0 space-y-4">
+              {/* Quick Input Buttons */}
+              <div className="space-y-1">
+                <div className="flex items-center gap-1.5">
+                  {Array.from({ length: 4 }, (_, i) => i + 1).map((slot) => {
+                    const preset = presets.find((p) => p.slot_number === slot);
+                    const hasContent = preset && (preset.health_issue || preset.treatment || preset.medication);
+                    return (
+                      <Button
+                        key={slot}
+                        variant={hasContent ? "secondary" : "outline"}
+                        size="sm"
+                        className="h-7 w-[6.5rem] px-1 text-xs"
+                        onClick={() => applyPreset(slot)}
+                        title={preset?.label || `F${slot}`}
+                      >
+                        <span className="font-mono mr-1 opacity-60">F{slot}</span>
+                        {preset?.label ? (
+                          <span className="max-w-[4rem] truncate">{preset.label}</span>
+                        ) : null}
+                      </Button>
+                    );
+                  })}
+                  {presets.filter((p) => p.slot_number > 8).length > 0 && (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" size="sm" className="h-7 flex-1 px-2 text-xs">
+                          빠른 입력 추가 <ChevronDown className="h-3 w-3 ml-0.5" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-2 pointer-events-auto" align="start">
+                        <div className="space-y-1 max-h-48 overflow-y-auto">
+                          {presets
+                            .filter((p) => p.slot_number > 8)
+                            .slice(0, 9)
+                            .map((preset, index) => (
+                              <Button
+                                key={preset.slot_number}
+                                variant="ghost"
+                                size="sm"
+                                className="w-full justify-start h-8 text-xs"
+                                onClick={() => applyPreset(preset.slot_number)}
+                              >
+                                <span className="font-mono text-[10px] opacity-50 mr-1.5">#{index + 1}</span>
+                                <span className="font-semibold mr-2">{preset.label || `프리셋 ${index + 1}`}</span>
+                                <span className="text-muted-foreground truncate">
+                                  {preset.health_issue || preset.treatment || ""}
+                                </span>
+                                <span className="ml-auto text-[10px] opacity-40">Alt+{index + 1}</span>
+                              </Button>
+                            ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  )}
+                </div>
+                <div className="flex items-center gap-1.5">
+                  {Array.from({ length: 4 }, (_, i) => i + 5).map((slot) => {
+                    const preset = presets.find((p) => p.slot_number === slot);
+                    const hasContent = preset && (preset.health_issue || preset.treatment || preset.medication);
+                    return (
+                      <Button
+                        key={slot}
+                        variant={hasContent ? "secondary" : "outline"}
+                        size="sm"
+                        className="h-7 w-[6.5rem] px-1 text-xs"
+                        onClick={() => applyPreset(slot)}
+                        title={preset?.label || `F${slot}`}
+                      >
+                        <span className="font-mono mr-1 opacity-60">F{slot}</span>
+                        {preset?.label ? (
+                          <span className="max-w-[4rem] truncate">{preset.label}</span>
+                        ) : null}
+                      </Button>
+                    );
+                  })}
                   <Button
-                    key={slot}
-                    variant={hasContent ? "secondary" : "outline"}
+                    variant="ghost"
                     size="sm"
-className="h-7 w-[6.5rem] px-1 text-xs"
-                     onClick={() => applyPreset(slot)}
-                     title={preset?.label || `F${slot}`}
+                    className="ml-auto flex-1 h-7 px-2 text-xs text-muted-foreground"
+                    onClick={() => setSettingsOpen(true)}
                   >
-                    <span className="font-mono mr-1 opacity-60">F{slot}</span>
-                    {preset?.label ? (
-                      <span className="max-w-[4rem] truncate">{preset.label}</span>
-                    ) : null}
+                    <Settings className="h-3.5 w-3.5 mr-1" />
+                    빠른 입력 설정
                   </Button>
-                );
-              })}
-              {presets.filter((p) => p.slot_number > 8).length > 0 && (
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" size="sm" className="h-7 flex-1 px-2 text-xs">
-                      빠른 입력 추가 <ChevronDown className="h-3 w-3 ml-0.5" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-2 pointer-events-auto" align="start">
-                    <div className="space-y-1 max-h-48 overflow-y-auto">
-                      {presets
-                        .filter((p) => p.slot_number > 8)
-                        .slice(0, 9)
-                        .map((preset, index) => (
-                          <Button
-                            key={preset.slot_number}
-                            variant="ghost"
-                            size="sm"
-                            className="w-full justify-start h-8 text-xs"
-                            onClick={() => applyPreset(preset.slot_number)}
-                          >
-                            <span className="font-mono text-[10px] opacity-50 mr-1.5">#{index + 1}</span>
-                            <span className="font-semibold mr-2">{preset.label || `프리셋 ${index + 1}`}</span>
-                            <span className="text-muted-foreground truncate">
-                              {preset.health_issue || preset.treatment || ""}
-                            </span>
-                            <span className="ml-auto text-[10px] opacity-40">Alt+{index + 1}</span>
-                          </Button>
-                        ))}
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              )}
-            </div>
-            {/* Row 2: F5~F8 + 설정 버튼 */}
-            <div className="flex items-center gap-1.5">
-              {Array.from({ length: 4 }, (_, i) => i + 5).map((slot) => {
-                const preset = presets.find((p) => p.slot_number === slot);
-                const hasContent = preset && (preset.health_issue || preset.treatment || preset.medication);
-                return (
-                  <Button
-                    key={slot}
-                    variant={hasContent ? "secondary" : "outline"}
-                    size="sm"
-                    className="h-7 w-[6.5rem] px-1 text-xs"
-                    onClick={() => applyPreset(slot)}
-                    title={preset?.label || `F${slot}`}
-                  >
-                    <span className="font-mono mr-1 opacity-60">F{slot}</span>
-                    {preset?.label ? (
-                      <span className="max-w-[4rem] truncate">{preset.label}</span>
-                    ) : null}
-                  </Button>
-                );
-              })}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="ml-auto flex-1 h-7 px-2 text-xs text-muted-foreground"
-                onClick={() => setSettingsOpen(true)}
-              >
-                <Settings className="h-3.5 w-3.5 mr-1" />
-                빠른 입력 설정
-              </Button>
-            </div>
-          </div>
+                </div>
+              </div>
 
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>증상</Label>
-              <Textarea
-                placeholder="예: 두통, 복통, 넘어져서 무릎 찰과상..."
-                value={healthIssue}
-                onChange={(e) => setHealthIssue(e.target.value)}
-                rows={2}
-              />
+              <div className="space-y-3">
+                <div className="space-y-1.5">
+                  <Label>증상</Label>
+                  <Textarea
+                    placeholder="예: 두통, 복통, 넘어져서 무릎 찰과상..."
+                    value={healthIssue}
+                    onChange={(e) => setHealthIssue(e.target.value)}
+                    rows={2}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>처치 및 조치</Label>
+                  <Textarea
+                    placeholder="예: 소독 후 밴드 부착, 냉찜질..."
+                    value={treatment}
+                    onChange={(e) => setTreatment(e.target.value)}
+                    rows={2}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>투약 내용</Label>
+                  <Textarea
+                    placeholder="예: 타이레놀 1정, 소화제..."
+                    value={medication}
+                    onChange={(e) => setMedication(e.target.value)}
+                    rows={2}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>체온</Label>
+                  <Input
+                    placeholder="예: 37.5"
+                    value={temperature}
+                    onChange={(e) => setTemperature(e.target.value)}
+                  />
+                </div>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label>처치 및 조치</Label>
-              <Textarea
-                placeholder="예: 소독 후 밴드 부착, 냉찜질..."
-                value={treatment}
-                onChange={(e) => setTreatment(e.target.value)}
-                rows={2}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>투약 내용</Label>
-              <Textarea
-                placeholder="예: 타이레놀 1정, 소화제..."
-                value={medication}
-                onChange={(e) => setMedication(e.target.value)}
-                rows={2}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>체온</Label>
-              <Input
-                placeholder="예: 37.5"
-                value={temperature}
-                onChange={(e) => setTemperature(e.target.value)}
-              />
+
+            {/* Right: History */}
+            <div className="w-[280px] shrink-0 border-l pl-4">
+              <h3 className="text-sm font-semibold mb-3">📋 이전 방문 기록</h3>
+              {historyLoading ? (
+                <p className="text-xs text-muted-foreground">불러오는 중...</p>
+              ) : history.length === 0 ? (
+                <p className="text-xs text-muted-foreground">이전 방문 기록이 없습니다</p>
+              ) : (
+                <ScrollArea className="h-[380px]">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="border-b text-muted-foreground">
+                        <th className="text-left py-1 pr-2 font-medium">일시</th>
+                        <th className="text-left py-1 pr-2 font-medium">증상</th>
+                        <th className="text-left py-1 pr-2 font-medium">처치</th>
+                        <th className="text-left py-1 font-medium">체온</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {history.map((h) => (
+                        <tr key={h.id} className="border-b border-muted/30">
+                          <td className="py-1.5 pr-2 whitespace-nowrap">
+                            {format(new Date(h.visited_at), "MM/dd HH:mm")}
+                          </td>
+                          <td className="py-1.5 pr-2 truncate max-w-[80px]" title={h.health_issue || ""}>
+                            {h.health_issue || "-"}
+                          </td>
+                          <td className="py-1.5 pr-2 truncate max-w-[80px]" title={h.treatment || ""}>
+                            {h.treatment || "-"}
+                          </td>
+                          <td className="py-1.5 whitespace-nowrap">
+                            {h.temperature || "-"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </ScrollArea>
+              )}
             </div>
           </div>
 
