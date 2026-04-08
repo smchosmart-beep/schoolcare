@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, addDays, isSameDay } from "date-fns";
 import { ko } from "date-fns/locale";
-import { Download, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import { Download, Calendar, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import VisitRecordModal from "./VisitRecordModal";
 import * as XLSX from "xlsx";
 
 interface Visit {
@@ -33,6 +34,8 @@ export default function HealthJournal({ teacherId }: Props) {
   const [visits, setVisits] = useState<Visit[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>("daily");
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedVisit, setSelectedVisit] = useState<Visit | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const getDateRange = useCallback(() => {
     if (viewMode === "daily") {
@@ -142,7 +145,38 @@ export default function HealthJournal({ teacherId }: Props) {
     toast.success("엑셀 파일이 다운로드되었습니다.");
   };
 
-  
+  const handleRowClick = (v: Visit) => {
+    setSelectedVisit(v);
+    setModalOpen(true);
+  };
+
+  const handleSave = async (data: { health_issue: string; treatment: string; medication: string; temperature: string }) => {
+    if (!selectedVisit) return;
+    const { error } = await supabase
+      .from("visits")
+      .update(data)
+      .eq("id", selectedVisit.id);
+    if (error) {
+      toast.error("수정에 실패했습니다.");
+      return;
+    }
+    toast.success("보건일지가 수정되었습니다.");
+    setModalOpen(false);
+    setSelectedVisit(null);
+    fetchVisits();
+  };
+
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    if (!confirm("이 기록을 삭제하시겠습니까?")) return;
+    const { error } = await supabase.from("visits").delete().eq("id", id);
+    if (error) {
+      toast.error("삭제에 실패했습니다.");
+      return;
+    }
+    toast.success("기록이 삭제되었습니다.");
+    fetchVisits();
+  };
 
   return (
     <div className="space-y-6">
@@ -221,11 +255,16 @@ export default function HealthJournal({ teacherId }: Props) {
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">처치</th>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">투약</th>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">체온</th>
+                  <th className="px-3 py-2 text-center font-medium text-muted-foreground">작업</th>
                 </tr>
               </thead>
               <tbody>
                 {visits.map((v) => (
-                  <tr key={v.id} className="border-b last:border-0">
+                  <tr
+                    key={v.id}
+                    className="border-b last:border-0 cursor-pointer hover:bg-muted/30 transition-colors"
+                    onClick={() => handleRowClick(v)}
+                  >
                     <td className="whitespace-nowrap px-3 py-2 text-foreground">
                       {format(new Date(v.visited_at), "M/d HH:mm")}
                     </td>
@@ -250,6 +289,16 @@ export default function HealthJournal({ teacherId }: Props) {
                     <td className="max-w-[150px] truncate px-3 py-2 text-foreground">{v.treatment || "-"}</td>
                     <td className="max-w-[100px] truncate px-3 py-2 text-foreground">{v.medication || "-"}</td>
                     <td className="whitespace-nowrap px-3 py-2 text-foreground">{v.temperature || "-"}</td>
+                    <td className="px-3 py-2 text-center">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
+                        onClick={(e) => handleDelete(e, v.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -257,6 +306,14 @@ export default function HealthJournal({ teacherId }: Props) {
           </div>
         )}
       </div>
+
+      <VisitRecordModal
+        open={modalOpen}
+        onClose={() => { setModalOpen(false); setSelectedVisit(null); }}
+        visit={selectedVisit}
+        onSave={handleSave}
+        teacherId={teacherId}
+      />
     </div>
   );
 }
