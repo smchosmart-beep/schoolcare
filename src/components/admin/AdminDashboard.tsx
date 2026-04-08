@@ -126,7 +126,7 @@ export default function AdminDashboard({ teacherId }: Props) {
     await supabase.from("waiting_queue").delete().eq("id", item.id);
 
     if (data) {
-      setSelectedVisit(data);
+      setSelectedVisit({ ...data, student_name: item.student_name });
       setModalOpen(true);
     }
     toast.success(`${item.student_name} 학생 진료를 시작합니다.`);

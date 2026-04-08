@@ -66,17 +66,14 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, onDelet
   const fetchHistory = useCallback(async () => {
     if (!visit || !teacherId) return;
     setHistoryLoading(true);
-    const { data } = await supabase
-      .from("visits")
-      .select("id, visited_at, health_issue, treatment, temperature, visit_type, self_treatment_item")
-      .eq("teacher_id", teacherId)
-      .eq("student_grade", visit.student_grade)
-      .eq("student_class", visit.student_class)
-      .eq("student_number", visit.student_number)
-      .neq("id", visit.id)
-      .order("visited_at", { ascending: false })
-      .limit(50);
-    setHistory(data || []);
+    const { data } = await supabase.rpc("get_visits_decrypted", {
+      p_teacher_id: teacherId,
+    });
+    const allVisits = (data || []) as unknown as (HistoryRecord & { student_grade: number; student_class: string; student_number: number })[];
+    const filtered = allVisits
+      .filter(v => v.student_grade === visit.student_grade && v.student_class === visit.student_class && v.student_number === visit.student_number && v.id !== visit.id)
+      .slice(0, 50);
+    setHistory(filtered);
     setHistoryLoading(false);
   }, [visit, teacherId]);
 
