@@ -30,6 +30,8 @@ interface HistoryRecord {
   health_issue: string | null;
   treatment: string | null;
   temperature: string | null;
+  visit_type: string;
+  self_treatment_item: string | null;
 }
 
 interface Props {
