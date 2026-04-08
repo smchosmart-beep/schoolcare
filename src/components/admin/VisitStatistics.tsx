@@ -87,7 +87,7 @@ export default function VisitStatistics({ teacherId }: VisitStatisticsProps) {
           <CardTitle className="text-lg">기간 설정</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap items-end gap-3">
+          <div className="flex flex-wrap items-end gap-4">
             <div className="space-y-1">
               <label className="text-sm text-muted-foreground">시작일</label>
               <Popover>
