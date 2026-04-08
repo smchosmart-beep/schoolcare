@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, addDays, isSameDay } from "date-fns";
 import { ko } from "date-fns/locale";
-import { Download, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import { Download, Calendar, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import VisitRecordModal from "./VisitRecordModal";
 import * as XLSX from "xlsx";
 
 interface Visit {
