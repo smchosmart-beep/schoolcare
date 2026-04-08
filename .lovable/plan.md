@@ -1,29 +1,31 @@
 
 
-# 이전 방문 기록 레이아웃 개선: 2줄 구조
+# 체온 표시 개선: °C 단위 + 색상 구분
 
 ## 변경 사항
 
-### `src/components/admin/VisitRecordModal.tsx` (288~315줄)
+### `src/components/admin/VisitRecordModal.tsx` (296줄)
 
-테이블 형식을 버리고, 카드/리스트 형식으로 변경:
+체온 표시 부분을 헬퍼 함수로 교체:
 
-- **첫째 줄**: 일시 · 증상 · 체온 (한 줄에 compact하게)
-- **둘째 줄**: 처치 내용 (잘리지 않고 전체 표시)
+- `°C` 단위 추가
+- 색상 분기:
+  - `< 37`: 녹색 (`text-green-600`)
+  - `>= 37, < 38`: 노란색 (`text-yellow-600`)
+  - `>= 38`: 빨간색 (`text-red-600`)
+- 체온 값이 없으면 기존처럼 `-` 표시
 
-```text
-┌──────────────────────────────┐
-│ 04/08 10:22  두통      36.8 │
-│ └ 타이레놀 1정 투약, 냉찜질  │
-├──────────────────────────────┤
-│ 04/03 14:20  복통       -   │
-│ └ 소화제 투약               │
-└──────────────────────────────┘
+```tsx
+const getTempDisplay = (temp: string | null) => {
+  if (!temp) return <span className="text-muted-foreground">-</span>;
+  const n = parseFloat(temp);
+  const color = isNaN(n) ? "text-muted-foreground"
+    : n >= 38 ? "text-red-600"
+    : n >= 37 ? "text-yellow-600"
+    : "text-green-600";
+  return <span className={`font-medium ${color}`}>{temp}°C</span>;
+};
 ```
 
-구체적으로:
-- `<table>` 제거 → `div` 기반 리스트로 교체
-- 각 항목을 `div`로 감싸고 `border-b`로 구분
-- 첫째 줄: `flex justify-between` — 왼쪽에 일시+증상, 오른쪽에 체온
-- 둘째 줄: 처치 내용을 `text-muted-foreground`로 전체 표시 (truncate 제거)
+296줄의 `<span className="text-muted-foreground">{h.temperature || "-"}</span>` → `{getTempDisplay(h.temperature)}`
 
