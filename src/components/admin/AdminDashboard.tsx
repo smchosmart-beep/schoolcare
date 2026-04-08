@@ -62,7 +62,7 @@ export default function AdminDashboard({ teacherId }: Props) {
       .single();
 
     if (data) {
-      setSelectedVisit(data);
+      setSelectedVisit({ ...data, student_name: student.name });
       setModalOpen(true);
     }
     toast.success(`${student.name} 학생 보건일지를 작성합니다.`);
@@ -74,25 +74,16 @@ export default function AdminDashboard({ teacherId }: Props) {
 
   const fetchData = useCallback(async () => {
     const [queueRes, visitsRes] = await Promise.all([
-      supabase
-        .from("waiting_queue")
-        .select("*")
-        .eq("teacher_id", teacherId)
-        .gte("created_at", todayStr)
-        .order("created_at", { ascending: true }),
-      supabase
-        .from("visits")
-        .select("*")
-        .eq("teacher_id", teacherId)
-        .gte("visited_at", todayStr)
-        .order("visited_at", { ascending: false }),
+      supabase.rpc("get_queue_decrypted", { p_teacher_id: teacherId }),
+      supabase.rpc("get_visits_decrypted", { p_teacher_id: teacherId, p_start_date: todayStr }),
     ]);
 
-    if (queueRes.data) setQueue(queueRes.data);
-    if (visitsRes.data) {
-      setSelfVisits(visitsRes.data.filter((v) => v.visit_type === "self_treatment"));
-      setTeacherVisits(visitsRes.data.filter((v) => v.visit_type === "teacher_visit"));
-    }
+    const queueData = (queueRes.data || []) as unknown as QueueItem[];
+    const visitsData = (visitsRes.data || []) as unknown as Visit[];
+
+    setQueue(queueData);
+    setSelfVisits(visitsData.filter((v) => v.visit_type === "self_treatment"));
+    setTeacherVisits(visitsData.filter((v) => v.visit_type === "teacher_visit"));
   }, [teacherId, todayStr]);
 
   useEffect(() => {
@@ -135,7 +126,7 @@ export default function AdminDashboard({ teacherId }: Props) {
     await supabase.from("waiting_queue").delete().eq("id", item.id);
 
     if (data) {
-      setSelectedVisit(data);
+      setSelectedVisit({ ...data, student_name: item.student_name });
       setModalOpen(true);
     }
     toast.success(`${item.student_name} 학생 진료를 시작합니다.`);

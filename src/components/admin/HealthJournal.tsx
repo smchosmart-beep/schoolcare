@@ -53,14 +53,12 @@ export default function HealthJournal({ teacherId }: Props) {
 
   const fetchVisits = useCallback(async () => {
     const { start, end } = getDateRange();
-    const { data } = await supabase
-      .from("visits")
-      .select("*")
-      .eq("teacher_id", teacherId)
-      .gte("visited_at", start.toISOString())
-      .lte("visited_at", end.toISOString())
-      .order("visited_at", { ascending: false });
-    if (data) setVisits(data);
+    const { data } = await supabase.rpc("get_visits_decrypted", {
+      p_teacher_id: teacherId,
+      p_start_date: start.toISOString(),
+      p_end_date: end.toISOString(),
+    });
+    if (data) setVisits(data as unknown as Visit[]);
   }, [teacherId, getDateRange]);
 
   useEffect(() => {
