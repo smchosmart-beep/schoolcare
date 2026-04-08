@@ -166,7 +166,44 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_queue_decrypted: {
+        Args: { p_teacher_id: string }
+        Returns: {
+          created_at: string
+          id: string
+          student_class: string
+          student_grade: number
+          student_name: string
+          student_number: number
+          teacher_id: string
+        }[]
+      }
+      get_visits_decrypted: {
+        Args: {
+          p_end_date?: string
+          p_start_date?: string
+          p_teacher_id: string
+        }
+        Returns: {
+          created_at: string
+          health_issue: string
+          id: string
+          medication: string
+          self_treatment_item: string
+          status: string
+          student_class: string
+          student_grade: number
+          student_name: string
+          student_number: number
+          teacher_id: string
+          temperature: string
+          treatment: string
+          updated_at: string
+          visit_type: string
+          visited_at: string
+        }[]
+      }
+      private_encryption_key: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never
