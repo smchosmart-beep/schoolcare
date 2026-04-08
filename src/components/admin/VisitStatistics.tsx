@@ -102,7 +102,7 @@ export default function VisitStatistics({ teacherId }: VisitStatisticsProps) {
                 </PopoverContent>
               </Popover>
             </div>
-            <span className="pb-2 text-muted-foreground">~</span>
+            <span className="pb-2 px-2 text-muted-foreground">~</span>
             <div className="space-y-1">
               <label className="text-sm text-muted-foreground">종료일</label>
               <Popover>
