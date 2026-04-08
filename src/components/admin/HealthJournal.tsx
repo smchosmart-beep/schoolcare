@@ -265,7 +265,7 @@ export default function HealthJournal({ teacherId }: Props) {
                     onClick={() => handleRowClick(v)}
                   >
                     <td className="whitespace-nowrap px-3 py-2 text-foreground">
-                      {format(new Date(v.visited_at), "M/d HH:mm")}
+                      {format(new Date(v.visited_at), "M/d(EEE) HH:mm", { locale: ko })}
                     </td>
                     <td className="px-3 py-2">
                       <span className="font-medium text-foreground">{v.student_name}</span>
