@@ -333,6 +333,7 @@ export default function Kiosk() {
     selectClass: `${selectedGrade}학년 - 반을 선택하세요`,
     selectStudent: `${selectedGrade}학년 ${selectedClass}반 - 이름을 선택하세요`,
     selfTreatment: `${selectedStudent?.name} 학생 - 치료를 선택하세요`,
+    inputTemperature: "체온을 입력하세요",
     home: "",
   }[step];
 
