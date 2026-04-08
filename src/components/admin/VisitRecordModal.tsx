@@ -30,6 +30,8 @@ interface HistoryRecord {
   health_issue: string | null;
   treatment: string | null;
   temperature: string | null;
+  visit_type: string;
+  self_treatment_item: string | null;
 }
 
 interface Props {
@@ -66,7 +68,7 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, onDelet
     setHistoryLoading(true);
     const { data } = await supabase
       .from("visits")
-      .select("id, visited_at, health_issue, treatment, temperature")
+      .select("id, visited_at, health_issue, treatment, temperature, visit_type, self_treatment_item")
       .eq("teacher_id", teacherId)
       .eq("student_grade", visit.student_grade)
       .eq("student_class", visit.student_class)
@@ -301,13 +303,13 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, onDelet
                           <div className="flex justify-between items-center">
                             <span>
                               <span className="text-muted-foreground">{format(new Date(h.visited_at), "MM/dd HH:mm")}</span>
-                              <span className="ml-2 font-medium">{h.health_issue || "-"}</span>
+                              <span className="ml-2 font-medium">{h.health_issue || (h.visit_type === "self_treatment" ? "스스로 치료" : "-")}</span>
                             </span>
                             {getTempDisplay(h.temperature)}
                           </div>
-                          {h.treatment && (
+                          {(h.treatment || (h.visit_type === "self_treatment" && h.self_treatment_item)) && (
                             <div className="text-muted-foreground mt-0.5 pl-1">
-                              └ {h.treatment}
+                              └ {h.treatment || h.self_treatment_item}
                             </div>
                           )}
                         </div>
