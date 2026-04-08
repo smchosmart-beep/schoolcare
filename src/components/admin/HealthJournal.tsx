@@ -247,7 +247,7 @@ export default function HealthJournal({ teacherId }: Props) {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/50">
-                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">시간</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">일시</th>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">학생</th>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">유형</th>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">건강문제</th>
