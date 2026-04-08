@@ -410,6 +410,46 @@ export default function Kiosk() {
             )}
           </div>
         )}
+
+        {step === "inputTemperature" && (
+          <div className="mx-auto flex max-w-sm flex-col items-center gap-6">
+            {/* Temperature display */}
+            <div className="flex h-24 w-full items-center justify-center rounded-2xl border-2 border-primary/20 bg-card text-4xl font-bold text-foreground">
+              {temperatureInput || <span className="text-muted-foreground">36.5</span>}
+              {temperatureInput && <span className="ml-1 text-2xl text-muted-foreground">°C</span>}
+            </div>
+
+            {/* Keypad */}
+            <div className="grid w-full grid-cols-3 gap-3">
+              {["1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "0", "backspace"].map((key) => (
+                <button
+                  key={key}
+                  onClick={() => handleTempKeypad(key)}
+                  className="flex h-16 items-center justify-center rounded-xl border-2 border-primary/20 bg-card text-2xl font-bold text-foreground transition-all hover:border-primary hover:shadow-md active:scale-[0.95]"
+                >
+                  {key === "backspace" ? "⌫" : key}
+                </button>
+              ))}
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex w-full gap-3">
+              <button
+                onClick={() => submitTemperature(true)}
+                className="flex-1 rounded-2xl border-2 border-muted bg-card py-4 text-lg font-semibold text-muted-foreground transition-all hover:border-primary/50 active:scale-[0.97]"
+              >
+                건너뛰기
+              </button>
+              <button
+                onClick={() => submitTemperature(false)}
+                disabled={!temperatureInput}
+                className="flex-1 rounded-2xl bg-primary py-4 text-lg font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-[0.97] disabled:opacity-50"
+              >
+                확인
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
