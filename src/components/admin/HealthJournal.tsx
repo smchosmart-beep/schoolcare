@@ -85,8 +85,7 @@ export default function HealthJournal({ teacherId }: Props) {
   };
 
   const formatVisitRow = (v: Visit) => ({
-    날짜: format(new Date(v.visited_at), "yyyy-MM-dd"),
-    시간: format(new Date(v.visited_at), "HH:mm"),
+    일시: format(new Date(v.visited_at), "M/d(EEE) HH:mm", { locale: ko }),
     학년: v.student_grade,
     반: v.student_class,
     번호: v.student_number,
@@ -248,7 +247,7 @@ export default function HealthJournal({ teacherId }: Props) {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/50">
-                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">시간</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">일시</th>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">학생</th>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">유형</th>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">건강문제</th>
@@ -266,7 +265,7 @@ export default function HealthJournal({ teacherId }: Props) {
                     onClick={() => handleRowClick(v)}
                   >
                     <td className="whitespace-nowrap px-3 py-2 text-foreground">
-                      {format(new Date(v.visited_at), "M/d HH:mm")}
+                      {format(new Date(v.visited_at), "M/d(EEE) HH:mm", { locale: ko })}
                     </td>
                     <td className="px-3 py-2">
                       <span className="font-medium text-foreground">{v.student_name}</span>
