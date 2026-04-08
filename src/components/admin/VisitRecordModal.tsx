@@ -31,7 +31,7 @@ interface Props {
   teacherId: string;
 }
 
-export default function VisitRecordModal({ open, onClose, visit, onSave, teacherId }: Props) {
+export default function VisitRecordModal({ open, onClose, visit, onSave, onDelete, teacherId }: Props) {
   const [healthIssue, setHealthIssue] = useState("");
   const [treatment, setTreatment] = useState("");
   const [medication, setMedication] = useState("");
