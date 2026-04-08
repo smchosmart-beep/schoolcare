@@ -1,24 +1,28 @@
 
 
-# 보건일지 테이블 유형/건강문제/처치 표시 개선
+# 보건일지 "건강문제" → "증상" 변경 + 유형 자동 전환
 
 ## 변경 사항
 
 ### `src/components/admin/HealthJournal.tsx`
 
-**1. 유형 컬럼 (284줄)**
-- 현재: 스스로 치료 시 `v.self_treatment_item || "스스로"` 표시 → 항목명이 유형에 들어감
-- 변경: `"선생님"` 또는 `"스스로"` 두 가지만 표시
+**1. 컬럼 헤더 (253줄)**
+- `건강문제` → `증상`
 
-**2. 건강문제 컬럼 (287줄)**
-- 현재: `v.health_issue || "-"` → 스스로 치료도 `-` 표시 (정상, 유지)
+**2. 엑셀 내보내기 (95줄)**
+- `건강문제:` → `증상:`
 
-**3. 처치 컬럼 (288줄)**
-- 현재: `v.treatment || "-"` → 스스로 치료 시 `-`로 나옴
-- 변경: `v.treatment || (v.visit_type === "self_treatment" ? v.self_treatment_item : null) || "-"`
-  - 스스로 치료 시 `self_treatment_item` 값(예: "물파스 바르기")을 처치에 표시
+**3. handleSave (152~157줄)**
+- 보건교사가 증상(`health_issue`)을 입력하여 저장하면, `visit_type`도 `"teacher_visit"`으로 함께 업데이트
+- 조건: `data.health_issue`가 비어있지 않고, 기존 `selectedVisit.visit_type === "self_treatment"`인 경우
 
-**4. 엑셀 내보내기 (93~96줄)**
-- 유형: 이미 `"스스로 치료"` / `"보건선생님"` → `"스스로"` / `"선생님"`으로 통일
-- 처치: `v.treatment || (v.visit_type === "self_treatment" ? v.self_treatment_item : "") || ""`
+```tsx
+const updateData = { ...data };
+if (selectedVisit.visit_type === "self_treatment" && data.health_issue.trim()) {
+  updateData.visit_type = "teacher_visit";
+}
+await supabase.from("visits").update(updateData).eq("id", selectedVisit.id);
+```
+
+이렇게 하면 스스로 치료로 온 학생이라도 교사가 증상을 기록하면 자동으로 "선생님" 배지로 변경됩니다.
 
