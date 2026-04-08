@@ -286,22 +286,33 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, onDelet
               ) : (
                 <ScrollArea className="h-[380px]">
                   <div className="space-y-0 text-xs">
-                    {history.map((h) => (
-                      <div key={h.id} className="border-b border-muted/30 py-2">
-                        <div className="flex justify-between items-center">
-                          <span>
-                            <span className="text-muted-foreground">{format(new Date(h.visited_at), "MM/dd HH:mm")}</span>
-                            <span className="ml-2 font-medium">{h.health_issue || "-"}</span>
-                          </span>
-                          <span className="text-muted-foreground">{h.temperature || "-"}</span>
-                        </div>
-                        {h.treatment && (
-                          <div className="text-muted-foreground mt-0.5 pl-1">
-                            └ {h.treatment}
+                    {history.map((h) => {
+                      const getTempDisplay = (temp: string | null) => {
+                        if (!temp) return <span className="text-muted-foreground">-</span>;
+                        const n = parseFloat(temp);
+                        const color = isNaN(n) ? "text-muted-foreground"
+                          : n >= 38 ? "text-red-600"
+                          : n >= 37 ? "text-yellow-600"
+                          : "text-green-600";
+                        return <span className={`font-medium ${color}`}>{temp}°C</span>;
+                      };
+                      return (
+                        <div key={h.id} className="border-b border-muted/30 py-2">
+                          <div className="flex justify-between items-center">
+                            <span>
+                              <span className="text-muted-foreground">{format(new Date(h.visited_at), "MM/dd HH:mm")}</span>
+                              <span className="ml-2 font-medium">{h.health_issue || "-"}</span>
+                            </span>
+                            {getTempDisplay(h.temperature)}
                           </div>
-                        )}
-                      </div>
-                    ))}
+                          {h.treatment && (
+                            <div className="text-muted-foreground mt-0.5 pl-1">
+                              └ {h.treatment}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </ScrollArea>
               )}
