@@ -243,13 +243,24 @@ className="h-7 w-[6.5rem] px-1 text-xs"
             </div>
           </div>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={onClose}>
-              취소
-            </Button>
-            <Button onClick={() => onSave({ health_issue: healthIssue, treatment, medication, temperature })}>
-              저장
-            </Button>
+          <DialogFooter className="flex justify-between sm:justify-between">
+            {onDelete && visit ? (
+              <Button variant="destructive" onClick={() => {
+                if (confirm("이 기록을 삭제하시겠습니까?")) {
+                  onDelete(visit.id);
+                }
+              }}>
+                삭제
+              </Button>
+            ) : <div />}
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={onClose}>
+                취소
+              </Button>
+              <Button onClick={() => onSave({ health_issue: healthIssue, treatment, medication, temperature })}>
+                저장
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
