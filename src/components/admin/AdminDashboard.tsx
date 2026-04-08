@@ -74,25 +74,16 @@ export default function AdminDashboard({ teacherId }: Props) {
 
   const fetchData = useCallback(async () => {
     const [queueRes, visitsRes] = await Promise.all([
-      supabase
-        .from("waiting_queue")
-        .select("*")
-        .eq("teacher_id", teacherId)
-        .gte("created_at", todayStr)
-        .order("created_at", { ascending: true }),
-      supabase
-        .from("visits")
-        .select("*")
-        .eq("teacher_id", teacherId)
-        .gte("visited_at", todayStr)
-        .order("visited_at", { ascending: false }),
+      supabase.rpc("get_queue_decrypted", { p_teacher_id: teacherId }),
+      supabase.rpc("get_visits_decrypted", { p_teacher_id: teacherId, p_start_date: todayStr }),
     ]);
 
-    if (queueRes.data) setQueue(queueRes.data);
-    if (visitsRes.data) {
-      setSelfVisits(visitsRes.data.filter((v) => v.visit_type === "self_treatment"));
-      setTeacherVisits(visitsRes.data.filter((v) => v.visit_type === "teacher_visit"));
-    }
+    const queueData = (queueRes.data || []) as unknown as QueueItem[];
+    const visitsData = (visitsRes.data || []) as unknown as Visit[];
+
+    setQueue(queueData);
+    setSelfVisits(visitsData.filter((v) => v.visit_type === "self_treatment"));
+    setTeacherVisits(visitsData.filter((v) => v.visit_type === "teacher_visit"));
   }, [teacherId, todayStr]);
 
   useEffect(() => {
