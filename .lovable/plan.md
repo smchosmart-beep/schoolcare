@@ -1,49 +1,42 @@
 
 
-# 학생 개별 추가/삭제 기능 — 검토 결과
+# 학생 명단 엑셀 다운로드 기능 추가
 
-## 결론: 문제없이 구현 가능. 단, 1가지 주의사항 있음
+## 현재 상태
+- 엑셀 업로드(덮어쓰기), 개별 추가, 검색/삭제 기능은 이미 구현됨
+- **다운로드(백업) 기능만 없음**
 
----
+## 변경 사항
 
-## 문제없는 부분
+### `src/components/admin/StudentUpload.tsx`
+- "엑셀 파일 다운로드" 버튼 추가 (업로드 버튼 옆)
+- `xlsx` 라이브러리(이미 설치됨)를 사용하여 localStorage의 현재 학생 명단을 `.xlsx` 파일로 내보내기
+- 컬럼: 학년, 반, 번호, 이름
+- 학년 → 반 → 번호 순으로 정렬하여 내보내기
+- 파일명: `학생명단_YYYYMMDD.xlsx`
 
-| 항목 | 이유 |
-|------|------|
-| addStudent 중복 체크 | 학년+반+번호로 중복 확인 → 동일 학생 이중 등록 방지 가능 |
-| removeStudent | 배열 filter 후 saveStudents → localStorage 정상 반영 |
-| 엑셀 업로드와의 공존 | 엑셀은 덮어쓰기, 개별 추가/삭제는 기존 배열 수정 → 서로 독립적 |
-| DB 영향 | 학생 명단은 localStorage만 사용, DB 변경 없음 |
-| 암호화와의 관계 | 암호화는 visits/waiting_queue의 student_name 대상, 학생 명단과 무관 |
-
----
-
-## 주의사항: Kiosk 페이지의 학생 목록 동기화
-
-**문제**: `Kiosk.tsx` 51줄에서 `useEffect(() => setStudents(loadStudents()), [])` — 마운트 시 1회만 로드
-
-**영향**: 관리자가 학생을 추가/삭제한 후, 이미 열려 있는 키오스크 탭에는 변경이 반영되지 않음 (새로고침 필요)
-
-**해결**: 키오스크 화면이 `home` 스텝으로 돌아올 때마다 학생 목록을 다시 로드하도록 수정
-
-```tsx
-// Kiosk.tsx
-useEffect(() => {
-  if (step === "home") {
-    setStudents(loadStudents());
-  }
-}, [step]);
+### 구현 로직
+```typescript
+const handleDownload = () => {
+  const sorted = [...students].sort((a, b) => 
+    a.grade - b.grade || a.class.localeCompare(b.class) || a.number - b.number
+  );
+  const wsData = [["학년", "반", "번호", "이름"], ...sorted.map(s => [s.grade, s.class, s.number, s.name])];
+  const ws = XLSX.utils.aoa_to_sheet(wsData);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "학생명단");
+  const today = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+  XLSX.writeFile(wb, `학생명단_${today}.xlsx`);
+};
 ```
 
-이 한 줄 변경만 추가하면 키오스크에서도 항상 최신 학생 명단이 반영됩니다.
+### UI 위치
+기존 "엑셀 파일 업로드" 버튼과 "명단 전체 삭제" 버튼 사이에 다운로드 버튼 배치
 
----
+### 변경 파일
+| 파일 | 변경 |
+|------|------|
+| `src/components/admin/StudentUpload.tsx` | 다운로드 버튼 + handleDownload 함수 추가 |
 
-## 변경 파일 요약
-
-| 파일 | 변경 내용 |
-|------|-----------|
-| `src/lib/students.ts` | `addStudent()`, `removeStudent()` 함수 추가 |
-| `src/components/admin/StudentUpload.tsx` | 개별 추가 폼 + 검색/삭제 목록 UI |
-| `src/pages/Kiosk.tsx` | step 변경 시 학생 목록 재로드 (1줄) |
+DB 변경 없음. 새 라이브러리 설치 없음 (`xlsx` 이미 사용 중).
 
