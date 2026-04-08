@@ -92,7 +92,7 @@ export default function HealthJournal({ teacherId }: Props) {
     이름: v.student_name,
     유형: v.visit_type === "self_treatment" ? "스스로" : "선생님",
     "스스로 치료 항목": v.self_treatment_item || "",
-    건강문제: v.health_issue || "",
+    증상: v.health_issue || "",
     "처치 및 조치": v.treatment || (v.visit_type === "self_treatment" ? v.self_treatment_item : "") || "",
     투약내용: v.medication || "",
     체온: v.temperature || "",
@@ -151,9 +151,13 @@ export default function HealthJournal({ teacherId }: Props) {
 
   const handleSave = async (data: { health_issue: string; treatment: string; medication: string; temperature: string }) => {
     if (!selectedVisit) return;
+    const updateData: { health_issue: string; treatment: string; medication: string; temperature: string; visit_type?: string } = { ...data };
+    if (selectedVisit.visit_type === "self_treatment" && data.health_issue?.trim()) {
+      updateData.visit_type = "teacher_visit";
+    }
     const { error } = await supabase
       .from("visits")
-      .update(data)
+      .update(updateData as any)
       .eq("id", selectedVisit.id);
     if (error) {
       toast.error("수정에 실패했습니다.");
@@ -250,7 +254,7 @@ export default function HealthJournal({ teacherId }: Props) {
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">일시</th>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">학생</th>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">유형</th>
-                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">건강문제</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">증상</th>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">처치</th>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">투약</th>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">체온</th>
