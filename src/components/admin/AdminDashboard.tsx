@@ -62,7 +62,7 @@ export default function AdminDashboard({ teacherId }: Props) {
       .single();
 
     if (data) {
-      setSelectedVisit(data);
+      setSelectedVisit({ ...data, student_name: student.name });
       setModalOpen(true);
     }
     toast.success(`${student.name} 학생 보건일지를 작성합니다.`);
