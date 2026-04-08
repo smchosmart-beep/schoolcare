@@ -131,6 +131,12 @@ export default function Kiosk() {
 
   const handleSelfTreatment = async (option: TreatmentOption) => {
     if (!selectedStudent) return;
+    if (option.icon === "🌡️") {
+      setSelectedTreatment(option);
+      setTemperatureInput("");
+      setStep("inputTemperature");
+      return;
+    }
     await supabase.from("visits").insert({
       teacher_id: teacherId,
       student_grade: selectedStudent.grade,
@@ -143,6 +149,33 @@ export default function Kiosk() {
     });
     toast.success(`${selectedStudent.name} 학생 - ${option.name} 처리 완료!`);
     resetToHome();
+  };
+
+  const submitTemperature = async (skipTemp: boolean) => {
+    if (!selectedStudent || !selectedTreatment) return;
+    await supabase.from("visits").insert({
+      teacher_id: teacherId,
+      student_grade: selectedStudent.grade,
+      student_class: selectedStudent.class,
+      student_number: selectedStudent.number,
+      student_name: selectedStudent.name,
+      visit_type: "self_treatment",
+      self_treatment_item: selectedTreatment.name,
+      temperature: skipTemp ? null : temperatureInput || null,
+      status: "completed",
+    });
+    toast.success(`${selectedStudent.name} 학생 - ${selectedTreatment.name} 처리 완료!`);
+    resetToHome();
+  };
+
+  const handleTempKeypad = (key: string) => {
+    if (key === "backspace") {
+      setTemperatureInput((prev) => prev.slice(0, -1));
+      return;
+    }
+    if (key === "." && temperatureInput.includes(".")) return;
+    if (temperatureInput.length >= 5) return;
+    setTemperatureInput((prev) => prev + key);
   };
 
   const resetToHome = () => {
