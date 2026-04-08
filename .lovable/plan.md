@@ -1,16 +1,10 @@
 
 
-# 보건일지 테이블 "시간" → "일시" + 요일 추가
+# 이용현황 기간 설정 라벨-버튼 간격 추가
 
 ## 변경 사항
 
-### `src/components/admin/HealthJournal.tsx`
+### `src/components/admin/VisitStatistics.tsx`
 
-1. **컬럼 헤더** (251줄): `시간` → `일시`
-
-2. **셀 내용** (269줄): `format(new Date(v.visited_at), "M/d HH:mm")` → 요일 포함 포맷
-   - `date-fns/locale/ko` 사용하여 `M/d(EEE) HH:mm` → `4/8(화) 10:58`
-   - `format(new Date(v.visited_at), "M/d(EEE) HH:mm", { locale: ko })`
-
-3. **엑셀 내보내기** (89줄): `시간` 키도 `일시`로 변경, 포맷에 요일 추가
+91줄, 106줄의 `space-y-1` → `space-y-2`로 변경하여 "시작일"/"종료일" 라벨과 달력 선택 버튼 사이 간격을 넓힘.
 
