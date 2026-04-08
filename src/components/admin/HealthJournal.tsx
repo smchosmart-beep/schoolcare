@@ -34,6 +34,8 @@ export default function HealthJournal({ teacherId }: Props) {
   const [visits, setVisits] = useState<Visit[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>("daily");
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedVisit, setSelectedVisit] = useState<Visit | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const getDateRange = useCallback(() => {
     if (viewMode === "daily") {
