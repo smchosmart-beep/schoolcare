@@ -2,8 +2,10 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Trash2, ClipboardList, Heart, Stethoscope, Clock } from "lucide-react";
+import { Trash2, ClipboardList, Heart, Stethoscope, Clock, Plus } from "lucide-react";
 import VisitRecordModal from "./VisitRecordModal";
+import DirectVisitDialog from "./DirectVisitDialog";
+import { Student } from "@/lib/students";
 
 interface QueueItem {
   id: string;
@@ -41,6 +43,30 @@ export default function AdminDashboard({ teacherId }: Props) {
   const [teacherVisits, setTeacherVisits] = useState<Visit[]>([]);
   const [selectedVisit, setSelectedVisit] = useState<Visit | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [directDialogOpen, setDirectDialogOpen] = useState(false);
+
+  const handleDirectVisit = async (student: Student) => {
+    setDirectDialogOpen(false);
+    const { data } = await supabase
+      .from("visits")
+      .insert({
+        teacher_id: teacherId,
+        student_grade: student.grade,
+        student_class: student.class,
+        student_number: student.number,
+        student_name: student.name,
+        visit_type: "teacher_visit",
+        status: "pending",
+      })
+      .select()
+      .single();
+
+    if (data) {
+      setSelectedVisit(data);
+      setModalOpen(true);
+    }
+    toast.success(`${student.name} 학생 보건일지를 작성합니다.`);
+  };
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -149,6 +175,10 @@ export default function AdminDashboard({ teacherId }: Props) {
         <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-foreground">
           <Clock className="h-5 w-5 text-secondary" />
           보건선생님 대기 명단
+          <Button size="sm" variant="outline" className="ml-2" onClick={() => setDirectDialogOpen(true)}>
+            <Plus className="h-4 w-4 mr-1" />
+            직접 기록
+          </Button>
           <span className="ml-auto rounded-full bg-secondary/20 px-3 py-1 text-sm font-medium text-secondary-foreground">
             {queue.length}명
           </span>
@@ -261,6 +291,12 @@ export default function AdminDashboard({ teacherId }: Props) {
         visit={selectedVisit}
         onSave={handleSaveVisit}
         teacherId={teacherId}
+      />
+
+      <DirectVisitDialog
+        open={directDialogOpen}
+        onClose={() => setDirectDialogOpen(false)}
+        onSelect={handleDirectVisit}
       />
     </div>
   );
