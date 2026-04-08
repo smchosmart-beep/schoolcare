@@ -3,7 +3,7 @@ import { loadStudents, saveStudents, addStudent, removeStudent, type Student } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Upload, FileSpreadsheet, Trash2, Users, Plus, Search, X } from "lucide-react";
+import { Upload, Download, FileSpreadsheet, Trash2, Users, Plus, Search, X } from "lucide-react";
 import * as XLSX from "xlsx";
 
 interface StudentUploadProps {
