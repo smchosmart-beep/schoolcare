@@ -168,6 +168,12 @@ export default function StudentUpload({ onUploadComplete }: StudentUploadProps =
             </Button>
           </div>
           {students.length > 0 && (
+            <Button variant="outline" className="gap-2" onClick={handleDownload}>
+              <Download className="h-4 w-4" />
+              엑셀 파일 다운로드
+            </Button>
+          )}
+          {students.length > 0 && (
             <Button variant="destructive" className="gap-2" onClick={handleClear}>
               <Trash2 className="h-4 w-4" />
               명단 전체 삭제
