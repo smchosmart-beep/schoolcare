@@ -285,34 +285,24 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, onDelet
                 <p className="text-xs text-muted-foreground">이전 방문 기록이 없습니다</p>
               ) : (
                 <ScrollArea className="h-[380px]">
-                  <table className="w-full text-xs">
-                    <thead>
-                      <tr className="border-b text-muted-foreground">
-                        <th className="text-left py-1 pr-2 font-medium">일시</th>
-                        <th className="text-left py-1 pr-2 font-medium">증상</th>
-                        <th className="text-left py-1 pr-2 font-medium">처치</th>
-                        <th className="text-left py-1 font-medium">체온</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {history.map((h) => (
-                        <tr key={h.id} className="border-b border-muted/30">
-                          <td className="py-1.5 pr-2 whitespace-nowrap">
-                            {format(new Date(h.visited_at), "MM/dd HH:mm")}
-                          </td>
-                          <td className="py-1.5 pr-2 truncate max-w-[80px]" title={h.health_issue || ""}>
-                            {h.health_issue || "-"}
-                          </td>
-                          <td className="py-1.5 pr-2 truncate max-w-[80px]" title={h.treatment || ""}>
-                            {h.treatment || "-"}
-                          </td>
-                          <td className="py-1.5 whitespace-nowrap">
-                            {h.temperature || "-"}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  <div className="space-y-0 text-xs">
+                    {history.map((h) => (
+                      <div key={h.id} className="border-b border-muted/30 py-2">
+                        <div className="flex justify-between items-center">
+                          <span>
+                            <span className="text-muted-foreground">{format(new Date(h.visited_at), "MM/dd HH:mm")}</span>
+                            <span className="ml-2 font-medium">{h.health_issue || "-"}</span>
+                          </span>
+                          <span className="text-muted-foreground">{h.temperature || "-"}</span>
+                        </div>
+                        {h.treatment && (
+                          <div className="text-muted-foreground mt-0.5 pl-1">
+                            └ {h.treatment}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </ScrollArea>
               )}
             </div>
