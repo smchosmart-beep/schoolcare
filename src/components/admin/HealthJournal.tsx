@@ -85,8 +85,7 @@ export default function HealthJournal({ teacherId }: Props) {
   };
 
   const formatVisitRow = (v: Visit) => ({
-    날짜: format(new Date(v.visited_at), "yyyy-MM-dd"),
-    시간: format(new Date(v.visited_at), "HH:mm"),
+    일시: format(new Date(v.visited_at), "M/d(EEE) HH:mm", { locale: ko }),
     학년: v.student_grade,
     반: v.student_class,
     번호: v.student_number,
