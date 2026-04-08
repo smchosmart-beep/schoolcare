@@ -178,6 +178,7 @@ export default function HealthJournal({ teacherId }: Props) {
     fetchVisits();
   };
 
+  return (
     <div className="space-y-6">
       <div className="rounded-2xl border bg-card p-6 shadow-sm">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
@@ -254,11 +255,16 @@ export default function HealthJournal({ teacherId }: Props) {
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">처치</th>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">투약</th>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">체온</th>
+                  <th className="px-3 py-2 text-center font-medium text-muted-foreground">작업</th>
                 </tr>
               </thead>
               <tbody>
                 {visits.map((v) => (
-                  <tr key={v.id} className="border-b last:border-0">
+                  <tr
+                    key={v.id}
+                    className="border-b last:border-0 cursor-pointer hover:bg-muted/30 transition-colors"
+                    onClick={() => handleRowClick(v)}
+                  >
                     <td className="whitespace-nowrap px-3 py-2 text-foreground">
                       {format(new Date(v.visited_at), "M/d HH:mm")}
                     </td>
@@ -283,6 +289,16 @@ export default function HealthJournal({ teacherId }: Props) {
                     <td className="max-w-[150px] truncate px-3 py-2 text-foreground">{v.treatment || "-"}</td>
                     <td className="max-w-[100px] truncate px-3 py-2 text-foreground">{v.medication || "-"}</td>
                     <td className="whitespace-nowrap px-3 py-2 text-foreground">{v.temperature || "-"}</td>
+                    <td className="px-3 py-2 text-center">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
+                        onClick={(e) => handleDelete(e, v.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -290,6 +306,14 @@ export default function HealthJournal({ teacherId }: Props) {
           </div>
         )}
       </div>
+
+      <VisitRecordModal
+        open={modalOpen}
+        onClose={() => { setModalOpen(false); setSelectedVisit(null); }}
+        visit={selectedVisit}
+        onSave={handleSave}
+        teacherId={teacherId}
+      />
     </div>
   );
 }
