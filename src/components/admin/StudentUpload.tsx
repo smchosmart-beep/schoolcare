@@ -82,6 +82,23 @@ export default function StudentUpload({ onUploadComplete }: StudentUploadProps =
     toast.info("학생 명단이 삭제되었습니다.");
   };
 
+  const handleDownload = () => {
+    if (students.length === 0) {
+      toast.error("다운로드할 학생 명단이 없습니다.");
+      return;
+    }
+    const sorted = [...students].sort((a, b) =>
+      a.grade - b.grade || a.class.localeCompare(b.class) || a.number - b.number
+    );
+    const wsData = [["학년", "반", "번호", "이름"], ...sorted.map(s => [s.grade, s.class, s.number, s.name])];
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "학생명단");
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+    XLSX.writeFile(wb, `학생명단_${today}.xlsx`);
+    toast.success("학생 명단 엑셀 파일을 다운로드했습니다.");
+  };
+
   const handleAddStudent = () => {
     const grade = parseInt(newGrade);
     const number = parseInt(newNumber);
