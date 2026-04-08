@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Heart, Stethoscope, ArrowLeft, Users, Clock, Settings } from "lucide-react";
 import StudentUpload from "@/components/admin/StudentUpload";
 
-type KioskStep = "home" | "selectGrade" | "selectClass" | "selectStudent" | "selfTreatment";
+type KioskStep = "home" | "selectGrade" | "selectClass" | "selectStudent" | "selfTreatment" | "inputTemperature";
 type VisitType = "self_treatment" | "teacher_visit";
 
 interface QueueItem {
