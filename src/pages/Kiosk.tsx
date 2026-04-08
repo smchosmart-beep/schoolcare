@@ -36,6 +36,8 @@ export default function Kiosk() {
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [treatmentOptions, setTreatmentOptions] = useState<TreatmentOption[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [selectedTreatment, setSelectedTreatment] = useState<TreatmentOption | null>(null);
+  const [temperatureInput, setTemperatureInput] = useState("");
 
   const teacherId = user?.id || "";
 
