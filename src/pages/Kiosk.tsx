@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Heart, Stethoscope, ArrowLeft, Users, Clock, Settings } from "lucide-react";
 import StudentUpload from "@/components/admin/StudentUpload";
 
-type KioskStep = "home" | "selectGrade" | "selectClass" | "selectStudent" | "selfTreatment";
+type KioskStep = "home" | "selectGrade" | "selectClass" | "selectStudent" | "selfTreatment" | "inputTemperature";
 type VisitType = "self_treatment" | "teacher_visit";
 
 interface QueueItem {
@@ -36,6 +36,8 @@ export default function Kiosk() {
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [treatmentOptions, setTreatmentOptions] = useState<TreatmentOption[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [selectedTreatment, setSelectedTreatment] = useState<TreatmentOption | null>(null);
+  const [temperatureInput, setTemperatureInput] = useState("");
 
   const teacherId = user?.id || "";
 
@@ -129,6 +131,12 @@ export default function Kiosk() {
 
   const handleSelfTreatment = async (option: TreatmentOption) => {
     if (!selectedStudent) return;
+    if (option.icon === "🌡️") {
+      setSelectedTreatment(option);
+      setTemperatureInput("");
+      setStep("inputTemperature");
+      return;
+    }
     await supabase.from("visits").insert({
       teacher_id: teacherId,
       student_grade: selectedStudent.grade,
@@ -141,6 +149,33 @@ export default function Kiosk() {
     });
     toast.success(`${selectedStudent.name} 학생 - ${option.name} 처리 완료!`);
     resetToHome();
+  };
+
+  const submitTemperature = async (skipTemp: boolean) => {
+    if (!selectedStudent || !selectedTreatment) return;
+    await supabase.from("visits").insert({
+      teacher_id: teacherId,
+      student_grade: selectedStudent.grade,
+      student_class: selectedStudent.class,
+      student_number: selectedStudent.number,
+      student_name: selectedStudent.name,
+      visit_type: "self_treatment",
+      self_treatment_item: selectedTreatment.name,
+      temperature: skipTemp ? null : temperatureInput || null,
+      status: "completed",
+    });
+    toast.success(`${selectedStudent.name} 학생 - ${selectedTreatment.name} 처리 완료!`);
+    resetToHome();
+  };
+
+  const handleTempKeypad = (key: string) => {
+    if (key === "backspace") {
+      setTemperatureInput((prev) => prev.slice(0, -1));
+      return;
+    }
+    if (key === "." && temperatureInput.includes(".")) return;
+    if (temperatureInput.length >= 5) return;
+    setTemperatureInput((prev) => prev + key);
   };
 
   const resetToHome = () => {
@@ -156,6 +191,7 @@ export default function Kiosk() {
       case "selectClass": setStep("selectGrade"); break;
       case "selectStudent": setStep("selectClass"); break;
       case "selfTreatment": setStep("selectStudent"); break;
+      case "inputTemperature": setStep("selfTreatment"); break;
     }
   };
 
@@ -297,6 +333,7 @@ export default function Kiosk() {
     selectClass: `${selectedGrade}학년 - 반을 선택하세요`,
     selectStudent: `${selectedGrade}학년 ${selectedClass}반 - 이름을 선택하세요`,
     selfTreatment: `${selectedStudent?.name} 학생 - 치료를 선택하세요`,
+    inputTemperature: "체온을 입력하세요",
     home: "",
   }[step];
 
@@ -371,6 +408,46 @@ export default function Kiosk() {
                 <p className="text-sm mt-2">보건교사가 관리 페이지에서 항목을 추가해주세요.</p>
               </div>
             )}
+          </div>
+        )}
+
+        {step === "inputTemperature" && (
+          <div className="mx-auto flex max-w-sm flex-col items-center gap-6">
+            {/* Temperature display */}
+            <div className="flex h-24 w-full items-center justify-center rounded-2xl border-2 border-primary/20 bg-card text-4xl font-bold text-foreground">
+              {temperatureInput || <span className="text-muted-foreground">36.5</span>}
+              {temperatureInput && <span className="ml-1 text-2xl text-muted-foreground">°C</span>}
+            </div>
+
+            {/* Keypad */}
+            <div className="grid w-full grid-cols-3 gap-3">
+              {["1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "0", "backspace"].map((key) => (
+                <button
+                  key={key}
+                  onClick={() => handleTempKeypad(key)}
+                  className="flex h-16 items-center justify-center rounded-xl border-2 border-primary/20 bg-card text-2xl font-bold text-foreground transition-all hover:border-primary hover:shadow-md active:scale-[0.95]"
+                >
+                  {key === "backspace" ? "⌫" : key}
+                </button>
+              ))}
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex w-full gap-3">
+              <button
+                onClick={() => submitTemperature(true)}
+                className="flex-1 rounded-2xl border-2 border-muted bg-card py-4 text-lg font-semibold text-muted-foreground transition-all hover:border-primary/50 active:scale-[0.97]"
+              >
+                건너뛰기
+              </button>
+              <button
+                onClick={() => submitTemperature(false)}
+                disabled={!temperatureInput}
+                className="flex-1 rounded-2xl bg-primary py-4 text-lg font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-[0.97] disabled:opacity-50"
+              >
+                확인
+              </button>
+            </div>
           </div>
         )}
       </div>
