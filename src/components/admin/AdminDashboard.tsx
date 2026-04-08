@@ -292,6 +292,12 @@ export default function AdminDashboard({ teacherId }: Props) {
         onSave={handleSaveVisit}
         teacherId={teacherId}
       />
+
+      <DirectVisitDialog
+        open={directDialogOpen}
+        onClose={() => setDirectDialogOpen(false)}
+        onSelect={handleDirectVisit}
+      />
     </div>
   );
 }
