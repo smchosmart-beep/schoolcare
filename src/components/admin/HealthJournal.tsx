@@ -151,9 +151,13 @@ export default function HealthJournal({ teacherId }: Props) {
 
   const handleSave = async (data: { health_issue: string; treatment: string; medication: string; temperature: string }) => {
     if (!selectedVisit) return;
+    const updateData: Record<string, string> = { ...data };
+    if (selectedVisit.visit_type === "self_treatment" && data.health_issue?.trim()) {
+      updateData.visit_type = "teacher_visit";
+    }
     const { error } = await supabase
       .from("visits")
-      .update(data)
+      .update(updateData)
       .eq("id", selectedVisit.id);
     if (error) {
       toast.error("수정에 실패했습니다.");
