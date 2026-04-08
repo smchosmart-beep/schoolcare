@@ -2,8 +2,10 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Trash2, ClipboardList, Heart, Stethoscope, Clock } from "lucide-react";
+import { Trash2, ClipboardList, Heart, Stethoscope, Clock, Plus } from "lucide-react";
 import VisitRecordModal from "./VisitRecordModal";
+import DirectVisitDialog from "./DirectVisitDialog";
+import { Student } from "@/lib/students";
 
 interface QueueItem {
   id: string;
