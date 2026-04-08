@@ -301,13 +301,13 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, onDelet
                           <div className="flex justify-between items-center">
                             <span>
                               <span className="text-muted-foreground">{format(new Date(h.visited_at), "MM/dd HH:mm")}</span>
-                              <span className="ml-2 font-medium">{h.health_issue || "-"}</span>
+                              <span className="ml-2 font-medium">{h.health_issue || (h.visit_type === "self_treatment" ? "스스로 치료" : "-")}</span>
                             </span>
                             {getTempDisplay(h.temperature)}
                           </div>
-                          {h.treatment && (
+                          {(h.treatment || (h.visit_type === "self_treatment" && h.self_treatment_item)) && (
                             <div className="text-muted-foreground mt-0.5 pl-1">
-                              └ {h.treatment}
+                              └ {h.treatment || h.self_treatment_item}
                             </div>
                           )}
                         </div>
