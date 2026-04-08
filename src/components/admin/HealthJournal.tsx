@@ -312,6 +312,14 @@ export default function HealthJournal({ teacherId }: Props) {
         onClose={() => { setModalOpen(false); setSelectedVisit(null); }}
         visit={selectedVisit}
         onSave={handleSave}
+        onDelete={async (id) => {
+          const { error } = await supabase.from("visits").delete().eq("id", id);
+          if (error) { toast.error("삭제에 실패했습니다."); return; }
+          toast.success("기록이 삭제되었습니다.");
+          setModalOpen(false);
+          setSelectedVisit(null);
+          fetchVisits();
+        }}
         teacherId={teacherId}
       />
     </div>

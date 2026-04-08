@@ -290,6 +290,12 @@ export default function AdminDashboard({ teacherId }: Props) {
         onClose={() => setModalOpen(false)}
         visit={selectedVisit}
         onSave={handleSaveVisit}
+        onDelete={async (id) => {
+          await supabase.from("visits").delete().eq("id", id);
+          toast.success("기록이 삭제되었습니다.");
+          setModalOpen(false);
+          fetchData();
+        }}
         teacherId={teacherId}
       />
 
