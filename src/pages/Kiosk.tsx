@@ -48,8 +48,10 @@ export default function Kiosk() {
   }, [user, loading, navigate]);
 
   useEffect(() => {
-    setStudents(loadStudents());
-  }, []);
+    if (step === "home") {
+      setStudents(loadStudents());
+    }
+  }, [step]);
 
   // Fetch queue
   const fetchQueue = useCallback(async () => {
