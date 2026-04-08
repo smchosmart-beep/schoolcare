@@ -92,7 +92,7 @@ export default function HealthJournal({ teacherId }: Props) {
     이름: v.student_name,
     유형: v.visit_type === "self_treatment" ? "스스로" : "선생님",
     "스스로 치료 항목": v.self_treatment_item || "",
-    건강문제: v.health_issue || "",
+    증상: v.health_issue || "",
     "처치 및 조치": v.treatment || (v.visit_type === "self_treatment" ? v.self_treatment_item : "") || "",
     투약내용: v.medication || "",
     체온: v.temperature || "",
