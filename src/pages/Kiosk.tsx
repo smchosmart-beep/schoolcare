@@ -191,6 +191,7 @@ export default function Kiosk() {
       case "selectClass": setStep("selectGrade"); break;
       case "selectStudent": setStep("selectClass"); break;
       case "selfTreatment": setStep("selectStudent"); break;
+      case "inputTemperature": setStep("selfTreatment"); break;
     }
   };
 
