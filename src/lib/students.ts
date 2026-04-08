@@ -29,3 +29,25 @@ export function getStudentsInClass(students: Student[], grade: number, cls: stri
     .filter((s) => s.grade === grade && s.class === cls)
     .sort((a, b) => a.number - b.number);
 }
+
+export function addStudent(student: Student): { success: boolean; message: string } {
+  const students = loadStudents();
+  const duplicate = students.find(
+    (s) => s.grade === student.grade && s.class === student.class && s.number === student.number
+  );
+  if (duplicate) {
+    return { success: false, message: `${student.grade}학년 ${student.class}반 ${student.number}번은 이미 등록되어 있습니다 (${duplicate.name}).` };
+  }
+  students.push(student);
+  saveStudents(students);
+  return { success: true, message: `${student.name} 학생을 추가했습니다.` };
+}
+
+export function removeStudent(grade: number, cls: string, number: number): Student[] {
+  const students = loadStudents();
+  const filtered = students.filter(
+    (s) => !(s.grade === grade && s.class === cls && s.number === number)
+  );
+  saveStudents(filtered);
+  return filtered;
+}
