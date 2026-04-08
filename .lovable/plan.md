@@ -1,37 +1,40 @@
 
 
-# VisitRecordModal에 삭제 버튼 추가
+# 보건일지 모달 확장: 학생 이용 기록 패널 추가
 
 ## 변경 사항
 
 ### `src/components/admin/VisitRecordModal.tsx`
 
-**Props 추가** (25~31줄):
-- `onDelete?: (visitId: string) => void` 옵셔널 콜백 추가
+**1. 모달 너비 확장**
+- `max-w-2xl` → `max-w-5xl`
 
-**DialogFooter 수정** (245~252줄):
-- [취소] [저장] → [취소] [저장] [삭제] 배치
-- 삭제 버튼은 `variant="destructive"`, `onDelete` 있을 때만 표시
-- 클릭 시 confirm 후 `onDelete(visit.id)` 호출
+**2. 2단 레이아웃 적용**
+- 왼쪽(~60%): 기존 작성 폼 (프리셋 버튼, 증상, 처치, 투약, 체온)
+- 오른쪽(~40%): 해당 학생의 과거 보건실 이용 기록 목록
 
-```tsx
-<DialogFooter className="flex justify-between">
-  <Button variant="destructive" onClick={() => {
-    if (confirm("이 기록을 삭제하시겠습니까?") && visit) onDelete?.(visit.id);
-  }}>삭제</Button>
-  <div className="flex gap-2">
-    <Button variant="outline" onClick={onClose}>취소</Button>
-    <Button onClick={...}>저장</Button>
-  </div>
-</DialogFooter>
+**3. 오른쪽 패널: 이용 기록 조회**
+- 모달 열릴 때 `supabase.from("visits")` 쿼리로 같은 학생(student_grade, student_class, student_number, teacher_id) 기록 조회
+- 현재 편집 중인 visit은 제외 (`.neq("id", visit.id)`)
+- `visited_at` 내림차순 정렬, 최근 기록 우선
+- 각 항목: 일시(MM/DD HH:mm), 증상, 처치, 체온을 간단한 테이블 또는 리스트로 표시
+
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│ 김민서 (5학년 2반 53번)                                         │
+│ 방문 시간: 2026. 4. 8. 오전 10:22:07                            │
+├──────────────────────────────┬──────────────────────────────────┤
+│ [F1 두통] [F2] [F3] [F4]    │  📋 이전 방문 기록               │
+│ [F5] [F6] [F7] [F8] ⚙설정  │ ┌─────────────────────────────┐ │
+│                              │ │ 04/07 09:30  두통  냉찜질 36.5│ │
+│ 증상: [________]            │ │ 04/03 14:20  복통  소화제  -  │ │
+│ 처치: [________]            │ │ 03/28 11:00  찰과상 소독   -  │ │
+│ 투약: [________]            │ │ ...                         │ │
+│ 체온: [________]            │ └─────────────────────────────┘ │
+│                              │                                │
+│ [삭제]            [취소][저장]│                                │
+└──────────────────────────────┴──────────────────────────────────┘
 ```
 
-### `src/components/admin/AdminDashboard.tsx`
-
-- `VisitRecordModal`에 `onDelete` prop 전달
-- 삭제 시 visits에서 delete + 목록 새로고침 + 모달 닫기
-
-### `src/components/admin/HealthJournal.tsx`
-
-- 이미 VisitRecordModal 사용 중이면 동일하게 `onDelete` prop 전달
+**4. 이용 기록이 없을 때**: "이전 방문 기록이 없습니다" 표시
 
