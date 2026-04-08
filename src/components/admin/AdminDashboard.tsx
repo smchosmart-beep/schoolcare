@@ -43,6 +43,30 @@ export default function AdminDashboard({ teacherId }: Props) {
   const [teacherVisits, setTeacherVisits] = useState<Visit[]>([]);
   const [selectedVisit, setSelectedVisit] = useState<Visit | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [directDialogOpen, setDirectDialogOpen] = useState(false);
+
+  const handleDirectVisit = async (student: Student) => {
+    setDirectDialogOpen(false);
+    const { data } = await supabase
+      .from("visits")
+      .insert({
+        teacher_id: teacherId,
+        student_grade: student.grade,
+        student_class: student.class,
+        student_number: student.number,
+        student_name: student.name,
+        visit_type: "teacher_visit",
+        status: "pending",
+      })
+      .select()
+      .single();
+
+    if (data) {
+      setSelectedVisit(data);
+      setModalOpen(true);
+    }
+    toast.success(`${student.name} 학생 보건일지를 작성합니다.`);
+  };
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
