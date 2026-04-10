@@ -26,7 +26,7 @@ interface TreatmentOption {
 }
 
 export default function Kiosk() {
-  const { user, loading } = useAuth();
+  const { user, loading, expired } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState<KioskStep>("home");
   const [visitType, setVisitType] = useState<VisitType>("self_treatment");

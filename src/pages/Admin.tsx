@@ -13,9 +13,10 @@ import StudentUpload from "@/components/admin/StudentUpload";
 import HealthJournal from "@/components/admin/HealthJournal";
 import VisitStatistics from "@/components/admin/VisitStatistics";
 import UserManagement from "@/components/admin/UserManagement";
+import ExpiredNotice from "@/components/ExpiredNotice";
 
 export default function Admin() {
-  const { user, loading, isAdmin, signOut } = useAuth();
+  const { user, loading, isAdmin, expired, signOut } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,6 +45,11 @@ export default function Admin() {
   }
 
   if (!user) return null;
+
+  // Show expired notice for non-admin users
+  if (expired && !isAdmin) {
+    return <ExpiredNotice />;
+  }
 
   const schoolName = user.user_metadata?.school_name || "보건실";
   const tabCount = isAdmin ? 6 : 5;

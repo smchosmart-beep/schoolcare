@@ -37,6 +37,7 @@ export default function Login() {
       return;
     }
 
+    // approved but possibly expired → let them in, Admin/Kiosk will show notice
     setLoading(false);
     navigate("/admin");
   };
