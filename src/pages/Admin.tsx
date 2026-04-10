@@ -1,10 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { Heart, LogOut, Monitor, LayoutDashboard, Settings, FileText, Upload, BarChart3, Users } from "lucide-react";
 import { Heart, LogOut, Monitor, LayoutDashboard, Settings, FileText, Upload, BarChart3, Users } from "lucide-react";
 
 import AdminDashboard from "@/components/admin/AdminDashboard";
