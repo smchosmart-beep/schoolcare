@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Check, X, Clock, UserCheck } from "lucide-react";
+import { Check, X, Clock, UserCheck, CalendarDays } from "lucide-react";
 
 interface Profile {
   id: string;
@@ -12,6 +13,7 @@ interface Profile {
   school_name: string;
   approved: boolean;
   created_at: string;
+  expires_at: string | null;
 }
 
 export default function UserManagement() {
@@ -37,15 +39,20 @@ export default function UserManagement() {
   }, []);
 
   const handleApprove = async (id: string) => {
+    // Set expires_at to 1 year from now by default
+    const oneYearLater = new Date();
+    oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
+    const expiresAt = oneYearLater.toLocaleDateString('en-CA');
+
     const { error } = await supabase
       .from("profiles")
-      .update({ approved: true })
+      .update({ approved: true, expires_at: expiresAt })
       .eq("id", id);
 
     if (error) {
       toast.error("승인 처리 중 오류가 발생했습니다.");
     } else {
-      toast.success("승인 완료!");
+      toast.success("승인 완료! (사용 기간: 1년)");
       fetchProfiles();
     }
   };
@@ -62,6 +69,26 @@ export default function UserManagement() {
       toast.success("승인이 취소되었습니다.");
       fetchProfiles();
     }
+  };
+
+  const handleExpiresAtChange = async (id: string, date: string) => {
+    const { error } = await supabase
+      .from("profiles")
+      .update({ expires_at: date || null })
+      .eq("id", id);
+
+    if (error) {
+      toast.error("만료일 변경 중 오류가 발생했습니다.");
+    } else {
+      toast.success("만료일이 변경되었습니다.");
+      fetchProfiles();
+    }
+  };
+
+  const today = new Date().toLocaleDateString('en-CA');
+
+  const isExpired = (profile: Profile) => {
+    return !profile.expires_at || profile.expires_at < today;
   };
 
   const pendingProfiles = profiles.filter((p) => !p.approved);
@@ -135,10 +162,17 @@ export default function UserManagement() {
               {approvedProfiles.map((profile) => (
                 <div
                   key={profile.id}
-                  className="flex items-center justify-between rounded-lg border p-3"
+                  className="flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between"
                 >
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium">{profile.email}</p>
+                  <div className="space-y-1 min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium truncate">{profile.email}</p>
+                      {isExpired(profile) && (
+                        <Badge variant="destructive" className="text-xs shrink-0">
+                          만료됨
+                        </Badge>
+                      )}
+                    </div>
                     <div className="flex items-center gap-2">
                       {profile.school_name && (
                         <Badge variant="secondary" className="text-xs">
@@ -150,15 +184,26 @@ export default function UserManagement() {
                       </span>
                     </div>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-1 text-destructive"
-                    onClick={() => handleReject(profile.id)}
-                  >
-                    <X className="h-4 w-4" />
-                    승인 취소
-                  </Button>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex items-center gap-1.5">
+                      <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                      <Input
+                        type="date"
+                        className="w-[160px] h-8 text-xs"
+                        value={profile.expires_at || ""}
+                        onChange={(e) => handleExpiresAtChange(profile.id, e.target.value)}
+                      />
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-1 text-destructive"
+                      onClick={() => handleReject(profile.id)}
+                    >
+                      <X className="h-4 w-4" />
+                      승인 취소
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>

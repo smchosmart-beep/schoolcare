@@ -6,6 +6,7 @@ import { loadStudents, getGrades, getClasses, getStudentsInClass, type Student }
 import { toast } from "sonner";
 import { Heart, Stethoscope, ArrowLeft, Users, Clock, Settings } from "lucide-react";
 import StudentUpload from "@/components/admin/StudentUpload";
+import ExpiredNotice from "@/components/ExpiredNotice";
 
 type KioskStep = "home" | "selectGrade" | "selectClass" | "selectStudent" | "selfTreatment" | "inputTemperature";
 type VisitType = "self_treatment" | "teacher_visit";
@@ -26,7 +27,7 @@ interface TreatmentOption {
 }
 
 export default function Kiosk() {
-  const { user, loading } = useAuth();
+  const { user, loading, expired } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState<KioskStep>("home");
   const [visitType, setVisitType] = useState<VisitType>("self_treatment");
@@ -201,6 +202,11 @@ export default function Kiosk() {
   }
 
   if (!user) return null;
+
+  // Show expired notice
+  if (expired) {
+    return <ExpiredNotice />;
+  }
 
   // 학생 명단이 없으면 업로드 UI 표시
   if (students.length === 0) {
