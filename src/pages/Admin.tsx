@@ -5,16 +5,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Heart, LogOut, Monitor, LayoutDashboard, Settings, FileText, Upload, BarChart3 } from "lucide-react";
+import { Heart, LogOut, Monitor, LayoutDashboard, Settings, FileText, Upload, BarChart3, Users } from "lucide-react";
 
 import AdminDashboard from "@/components/admin/AdminDashboard";
 import SelfTreatmentSettings from "@/components/admin/SelfTreatmentSettings";
 import StudentUpload from "@/components/admin/StudentUpload";
 import HealthJournal from "@/components/admin/HealthJournal";
 import VisitStatistics from "@/components/admin/VisitStatistics";
+import UserManagement from "@/components/admin/UserManagement";
 
 export default function Admin() {
-  const { user, loading, signOut } = useAuth();
+  const { user, loading, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,6 +46,7 @@ export default function Admin() {
   if (!user) return null;
 
   const schoolName = user.user_metadata?.school_name || "보건실";
+  const tabCount = isAdmin ? 6 : 5;
 
   return (
     <div className="min-h-screen bg-background">
@@ -75,7 +77,7 @@ export default function Admin() {
       {/* Content */}
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid">
+          <TabsList className={`grid w-full lg:w-auto lg:inline-grid`} style={{ gridTemplateColumns: `repeat(${tabCount}, minmax(0, 1fr))` }}>
             <TabsTrigger value="dashboard" className="gap-2">
               <LayoutDashboard className="h-4 w-4" />
               <span className="hidden sm:inline">대시보드</span>
@@ -96,6 +98,12 @@ export default function Admin() {
               <BarChart3 className="h-4 w-4" />
               <span className="hidden sm:inline">이용현황</span>
             </TabsTrigger>
+            {isAdmin && (
+              <TabsTrigger value="users" className="gap-2">
+                <Users className="h-4 w-4" />
+                <span className="hidden sm:inline">사용자 관리</span>
+              </TabsTrigger>
+            )}
           </TabsList>
 
           <TabsContent value="dashboard">
@@ -113,6 +121,11 @@ export default function Admin() {
           <TabsContent value="statistics">
             <VisitStatistics teacherId={user.id} />
           </TabsContent>
+          {isAdmin && (
+            <TabsContent value="users">
+              <UserManagement />
+            </TabsContent>
+          )}
         </Tabs>
       </main>
     </div>

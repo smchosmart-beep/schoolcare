@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      profiles: {
+        Row: {
+          approved: boolean | null
+          created_at: string | null
+          email: string
+          id: string
+          school_name: string | null
+        }
+        Insert: {
+          approved?: boolean | null
+          created_at?: string | null
+          email: string
+          id: string
+          school_name?: string | null
+        }
+        Update: {
+          approved?: boolean | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          school_name?: string | null
+        }
+        Relationships: []
+      }
       quick_input_presets: {
         Row: {
           created_at: string
@@ -71,6 +95,24 @@ export type Database = {
           name?: string
           sort_order?: number | null
           teacher_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
         }
         Relationships: []
       }
@@ -203,10 +245,17 @@ export type Database = {
           visited_at: string
         }[]
       }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       private_encryption_key: { Args: never; Returns: string }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "teacher"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -333,6 +382,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "teacher"],
+    },
   },
 } as const
