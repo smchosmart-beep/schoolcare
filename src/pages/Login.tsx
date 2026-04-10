@@ -16,13 +16,29 @@ export default function Login() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
+      setLoading(false);
       toast.error("로그인 실패: " + error.message);
-    } else {
-      navigate("/admin");
+      return;
     }
+
+    // Check approval status
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("approved")
+      .eq("id", data.user.id)
+      .single();
+
+    if (!profile?.approved) {
+      await supabase.auth.signOut();
+      setLoading(false);
+      toast.error("관리자 승인 대기 중입니다. 승인 후 로그인할 수 있습니다.");
+      return;
+    }
+
+    setLoading(false);
+    navigate("/admin");
   };
 
   return (

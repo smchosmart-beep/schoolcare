@@ -33,7 +33,9 @@ export default function Signup() {
     if (error) {
       toast.error("회원가입 실패: " + error.message);
     } else {
-      toast.success("회원가입 성공! 이메일 인증 후 로그인해주세요.");
+      // Sign out immediately so unapproved user doesn't stay logged in
+      await supabase.auth.signOut();
+      toast.success("회원가입이 완료되었습니다. 이메일 인증 후 관리자 승인이 완료되면 로그인할 수 있습니다.");
       navigate("/login");
     }
   };
