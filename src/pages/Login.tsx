@@ -5,12 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Heart, LogIn } from "lucide-react";
+import { Heart, LogIn, Phone, ArrowLeft, Clock } from "lucide-react";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pendingApproval, setPendingApproval] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -23,7 +24,6 @@ export default function Login() {
       return;
     }
 
-    // Check approval status
     const { data: profile } = await supabase
       .from("profiles")
       .select("approved")
@@ -33,14 +33,49 @@ export default function Login() {
     if (!profile?.approved) {
       await supabase.auth.signOut();
       setLoading(false);
-      toast.error("관리자 승인 대기 중입니다. 승인 후 로그인할 수 있습니다.");
+      setPendingApproval(true);
       return;
     }
 
-    // approved but possibly expired → let them in, Admin/Kiosk will show notice
     setLoading(false);
     navigate("/admin");
   };
+
+  if (pendingApproval) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="w-full max-w-md text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-muted">
+            <Clock className="h-8 w-8 text-muted-foreground" />
+          </div>
+          <h1 className="text-2xl font-bold text-foreground">승인 대기 중</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            관리자 승인 후 로그인할 수 있습니다.
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            아래 연락처로 승인을 요청하세요.
+          </p>
+          <a
+            href="tel:010-5168-3210"
+            className="mt-4 inline-flex items-center gap-2 text-lg font-semibold text-primary hover:underline"
+          >
+            <Phone className="h-5 w-5" />
+            010-5168-3210
+          </a>
+          <div className="mt-6">
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() => setPendingApproval(false)}
+            >
+              <ArrowLeft className="h-4 w-4" />
+              돌아가기
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
