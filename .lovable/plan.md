@@ -1,31 +1,29 @@
 
 
-# 테마 색상을 네이비 블루로 변경
+# 하트 아이콘을 로고 이미지로 교체
 
-## 변경 파일
-`src/index.css`
+로그인 후에도 여러 페이지에서 Heart 아이콘이 사용되고 있습니다. 모두 로고 이미지로 교체합니다.
 
-## 변경 내용
+## 변경 파일 및 내용
 
-네이비에 가까운 파란색 기준: `220 55% 35%` (#283F6B 계열 — 짙은 네이비 블루)
+### 1. `src/pages/Index.tsx`
+- Heart → 로고 이미지 (로딩 스피너용, `h-12 w-12`)
 
-### 라이트 모드
-| 변수 | 현재 | 변경 |
-|------|------|------|
-| `--primary` | `217 91% 60%` | `220 55% 35%` |
-| `--accent` | `217 30% 93%` | `220 25% 93%` |
-| `--accent-foreground` | `217 91% 60%` | `220 55% 35%` |
-| `--ring` | `217 91% 60%` | `220 55% 35%` |
-| `--sidebar-background` | `217 91% 45%` | `220 55% 30%` |
-| `--sidebar-primary-foreground` | `217 91% 60%` | `220 55% 45%` |
-| `--sidebar-accent` | `217 60% 50%` | `220 45% 35%` |
-| `--sidebar-border` | `217 60% 50%` | `220 45% 35%` |
-| `--sidebar-ring` | `42 93% 64%` | 유지 |
+### 2. `src/pages/Admin.tsx`
+- 로딩 화면 Heart → 로고 이미지 (`h-12 w-12`)
+- 헤더 좌측 아이콘 Heart → 로고 이미지 (`h-5 w-5` → `h-10 w-10 rounded-xl`)
 
-### 다크 모드도 동일 톤으로 조정
+### 3. `src/pages/Kiosk.tsx`
+- 로딩 화면 Heart → 로고 이미지
+- 헤더 Heart → 로고 이미지 (2곳)
+- 학생 명단 업로드 안내 Heart → 로고 이미지
+- 스스로 치료 버튼 Heart → 로고 이미지
 
-버튼, 사이드바 등 전체 UI가 차분한 네이비 블루로 통일됩니다.
+### 4. `src/pages/Signup.tsx`
+- 회원가입 페이지 상단 Heart → 로고 이미지
 
-## 메모리 업데이트
-primary 색상을 네이비 블루로 갱신.
+### 5. `src/components/admin/AdminDashboard.tsx`
+- 스스로 치료 섹션 Heart → 로고 이미지
+
+모든 곳에서 `import schoolcareLogo from "@/assets/schoolcare-logo.png"` 사용하고, Heart 아이콘 대신 `<img>` 태그로 교체합니다. 크기는 기존 Heart 아이콘 크기에 맞춰 조정합니다.
 
