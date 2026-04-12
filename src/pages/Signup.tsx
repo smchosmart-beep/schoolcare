@@ -7,6 +7,22 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Heart, UserPlus } from "lucide-react";
 
+const translateAuthError = (message: string): string => {
+  if (message.includes("weak") || message.includes("easy to guess")) {
+    return "비밀번호가 너무 쉽습니다. 더 복잡한 비밀번호를 사용해주세요.";
+  }
+  if (message.includes("already registered") || message.includes("already been registered")) {
+    return "이미 가입된 이메일입니다.";
+  }
+  if (message.includes("invalid email")) {
+    return "유효하지 않은 이메일 형식입니다.";
+  }
+  if (message.includes("rate limit") || message.includes("too many requests")) {
+    return "요청이 너무 많습니다. 잠시 후 다시 시도해주세요.";
+  }
+  return message;
+};
+
 export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,7 +47,7 @@ export default function Signup() {
     });
     setLoading(false);
     if (error) {
-      toast.error("회원가입 실패: " + error.message);
+      toast.error("회원가입 실패: " + translateAuthError(error.message));
     } else {
       // Sign out immediately so unapproved user doesn't stay logged in
       await supabase.auth.signOut();
