@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import schoolcareLogo from "@/assets/schoolcare-logo.png";
+import schoolcareLogo from "@/assets/favicon-logo.png";
 
 export default function Index() {
   const { user, loading } = useAuth();

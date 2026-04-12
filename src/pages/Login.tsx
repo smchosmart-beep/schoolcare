@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { LogIn, Phone, ArrowLeft, Clock } from "lucide-react";
-import schoolcareLogo from "@/assets/schoolcare-logo.png";
+import schoolcareLogo from "@/assets/favicon-logo.png";
 
 export default function Login() {
   const [email, setEmail] = useState("");
