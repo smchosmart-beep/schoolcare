@@ -1,21 +1,38 @@
 
 
-# 미승인 사용자 로그인 시 연락처 안내 페이지 표시
+# 엑셀 다운로드 열너비 통일
 
-## 현재 동작
-- 미승인 사용자가 로그인하면 `toast.error`로 "관리자 승인 대기 중입니다"만 표시하고 즉시 `signOut` 처리
-- 사용자는 관리자 연락처를 알 수 없음
+## 문제
+`applyColumnWidths` 함수가 데이터 내용 길이에 따라 동적으로 열너비를 계산하므로, 데이터가 적은 주별/월별 시트에서는 열이 좁게 나옴.
+
+## 해결
+`applyColumnWidths` 함수를 수정하여 **고정 열너비**를 사용. 데이터 양에 관계없이 A~K열(날짜, 시간, 학년, 반, 번호, 이름, 유형, 스스로 치료 항목, 건강문제, 처치 및 조치, 투약내용, 체온, 상태)이 항상 동일한 너비로 출력되도록 변경.
+
+## 변경 파일
+`src/components/admin/HealthJournal.tsx` — `applyColumnWidths` 함수만 수정
 
 ## 변경 내용
+동적 계산 로직을 제거하고 고정 열너비 배열로 교체:
 
-### `src/pages/Login.tsx`
-- 미승인 시 `signOut` + toast 대신, **승인 대기 안내 페이지**를 로그인 폼 자리에 표시
-- `useState`로 `pendingApproval` 상태 추가
-- `pendingApproval === true`이면 로그인 폼 대신 안내 UI 렌더링:
-  - "승인 대기 중" 제목 + 안내 문구
-  - 관리자 연락처 `010-5168-3210` (tel: 링크)
-  - "돌아가기" 버튼 → `pendingApproval = false`로 폼 복귀
-- `signOut`은 여전히 호출 (세션 정리)
+```typescript
+const applyColumnWidths = (ws: XLSX.WorkSheet) => {
+  ws["!cols"] = [
+    { wch: 12 },  // 날짜
+    { wch: 8 },   // 시간
+    { wch: 5 },   // 학년
+    { wch: 5 },   // 반
+    { wch: 5 },   // 번호
+    { wch: 7 },   // 이름
+    { wch: 15 },  // 유형
+    { wch: 25 },  // 스스로 치료 항목
+    { wch: 25 },  // 건강문제
+    { wch: 65 },  // 처치 및 조치
+    { wch: 30 },  // 투약내용
+    { wch: 6 },   // 체온
+    { wch: 8 },   // 상태
+  ];
+};
+```
 
-변경 파일: `src/pages/Login.tsx` 1개
+호출부의 `applyColumnWidths(ws, rows)` → `applyColumnWidths(ws)`로 변경 (2곳).
 
