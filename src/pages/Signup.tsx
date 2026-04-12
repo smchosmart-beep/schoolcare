@@ -47,7 +47,7 @@ export default function Signup() {
     });
     setLoading(false);
     if (error) {
-      toast.error("회원가입 실패: " + error.message);
+      toast.error("회원가입 실패: " + translateAuthError(error.message));
     } else {
       // Sign out immediately so unapproved user doesn't stay logged in
       await supabase.auth.signOut();
