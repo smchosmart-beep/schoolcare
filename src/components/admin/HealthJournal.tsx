@@ -136,6 +136,41 @@ export default function HealthJournal({ teacherId }: Props) {
 
       const { end } = getDateRange();
       XLSX.writeFile(wb, `보건일지_주간_${format(start, "yyyyMMdd")}-${format(end, "yyyyMMdd")}.xlsx`);
+    } else if (viewMode === "monthly") {
+      const monthStart = startOfMonth(currentDate);
+      const monthEnd = endOfMonth(currentDate);
+
+      // Calculate week boundaries (Monday-based)
+      const weeks: { label: string; start: Date; end: Date }[] = [];
+      let weekStart = monthStart;
+      let weekNum = 1;
+
+      while (weekStart <= monthEnd) {
+        // Find the end of this week (Sunday) or end of month
+        const dayOfWeek = getDay(weekStart); // 0=Sun, 1=Mon, ...
+        const daysUntilSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
+        let weekEnd = addDays(weekStart, daysUntilSunday);
+        if (weekEnd > monthEnd) weekEnd = monthEnd;
+
+        weeks.push({ label: `${weekNum}주차`, start: weekStart, end: weekEnd });
+        weekNum++;
+        weekStart = addDays(weekEnd, 1);
+      }
+
+      for (const week of weeks) {
+        const weekVisits = visits.filter((v) => {
+          const d = new Date(v.visited_at);
+          return d >= week.start && d <= new Date(week.end.getFullYear(), week.end.getMonth(), week.end.getDate(), 23, 59, 59, 999);
+        });
+        const rows = weekVisits.length > 0
+          ? weekVisits.map(formatVisitRow)
+          : [{ 일시: `${format(week.start, "M/d")}~${format(week.end, "M/d")}`, 학년: "", 반: "", 번호: "", 이름: "기록 없음", 유형: "", "스스로 치료 항목": "", 증상: "", "처치 및 조치": "", 투약내용: "", 체온: "", 상태: "" }];
+        const ws = XLSX.utils.json_to_sheet(rows);
+        applyColumnWidths(ws);
+        XLSX.utils.book_append_sheet(wb, ws, week.label);
+      }
+
+      XLSX.writeFile(wb, `보건일지_월간_${format(currentDate, "yyyy년MM월")}.xlsx`);
     } else {
       const rows = visits.map(formatVisitRow);
       const ws = XLSX.utils.json_to_sheet(rows);
