@@ -1,14 +1,28 @@
 
 
-# 로그인 로고 크기 변경
+# 전체 테마 색상을 녹색에서 파란색으로 변경
 
 ## 변경 파일
-`src/pages/Login.tsx`
+`src/index.css`
 
 ## 변경 내용
-로고 이미지의 클래스를 `h-20 w-20` → `h-32 w-32`로 변경 (80px → 128px)
+CSS 변수의 녹색 계열(`153 94% 21%`)을 로고의 파란색 계열로 일괄 변경.
 
-```tsx
-<img src={schoolcareLogo} alt="SchoolCare" className="mx-auto mb-4 h-32 w-32 rounded-2xl" />
-```
+파란색 기준: `217 91% 60%` (#3B82F6 — 로고 아이콘과 유사한 블루)
+
+| 변수 | 현재 (녹색) | 변경 (파란색) |
+|------|-----------|-------------|
+| `--primary` | `153 94% 21%` | `217 91% 60%` |
+| `--accent` | `153 30% 93%` | `217 30% 93%` |
+| `--accent-foreground` | `153 94% 21%` | `217 91% 60%` |
+| `--ring` | `153 94% 21%` | `217 91% 60%` |
+| `--sidebar-background` | `153 94% 21%` | `217 91% 45%` |
+| `--sidebar-primary-foreground` | `153 94% 21%` | `217 91% 60%` |
+| `--sidebar-accent` | `153 60% 28%` | `217 60% 50%` |
+| `--sidebar-border` | `153 60% 28%` | `217 60% 50%` |
+
+모든 `bg-primary`, `text-primary`, `ring-primary` 등을 사용하는 버튼/UI가 자동으로 파란색으로 변경됨.
+
+## 메모리 업데이트
+`mem://index.md`와 `mem://design/tokens`의 primary 색상을 #3B82F6(blue)으로 갱신.
 
