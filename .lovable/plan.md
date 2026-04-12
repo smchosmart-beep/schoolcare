@@ -1,27 +1,30 @@
 
 
-# 이용 현황 탭 엑셀 다운로드 + 빠른 기간 설정
-
-## 변경 파일
-`src/components/admin/VisitStatistics.tsx`
+# 로그인 페이지 아이콘 교체 + 파비콘 변경
 
 ## 변경 내용
 
-### 1. 빠른 기간 설정 버튼 추가
-기간 설정 카드에 월별/연도별 빠른 선택 버튼 추가:
-- **월별**: 이번 달, 지난달, 2개월 전 등 최근 몇 개월 버튼 + 월 선택기
-- **연도별**: 올해, 작년 버튼
-- 버튼 클릭 시 `startDate`/`endDate` 자동 설정 후 `handleSearch` 자동 호출
+### 1. 업로드된 이미지를 프로젝트에 복사
+- `user-uploads://보건일지_아이콘-Photoroom.png` → `src/assets/schoolcare-logo.png`
+- `user-uploads://보건일지_아이콘-Photoroom.png` → `public/favicon.png` (파비콘용)
 
-```
-[이번 달] [지난달] [올해] [작년]  ← 빠른 선택 버튼
-시작일 [____] ~ 종료일 [____]  [조회]  ← 기존 캘린더 유지
+### 2. `src/pages/Login.tsx`
+- `Heart` 아이콘 import 제거
+- 녹색 배경 + 하트 아이콘 div를 업로드된 이미지로 교체:
+```tsx
+import schoolcareLogo from "@/assets/schoolcare-logo.png";
+// ...
+<img src={schoolcareLogo} alt="SchoolCare" className="mx-auto mb-4 h-20 w-20 rounded-2xl" />
 ```
 
-### 2. 엑셀 다운로드 기능 추가
-- 조회 결과가 있을 때 "엑셀 다운로드" 버튼 표시
-- `xlsx` 라이브러리 사용 (이미 프로젝트에 설치됨)
-- 시트 내용: 날짜, 요일, 스스로 치료, 선생님 치료, 합계 + 마지막 행에 합계
-- 고정 열너비 적용 (HealthJournal과 동일 패턴)
-- 파일명: `이용현황_yyyy-MM-dd~yyyy-MM-dd.xlsx`
+### 3. `index.html`
+- 기존 favicon을 새 이미지로 교체:
+```html
+<link rel="icon" href="/favicon.png" type="image/png">
+```
+
+## 변경 파일
+- `src/pages/Login.tsx`
+- `index.html`
+- 새 파일: `src/assets/schoolcare-logo.png`, `public/favicon.png`
 
