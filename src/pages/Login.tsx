@@ -84,8 +84,8 @@ export default function Login() {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary">
             <Heart className="h-8 w-8 text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-bold text-foreground">보건일지</h1>
-          <p className="mt-1 text-sm text-muted-foreground">보건교사 전용 관리 시스템</p>
+          <h1 className="text-2xl font-bold text-foreground">스쿨케어 (SchoolCare)</h1>
+          <p className="mt-1 text-sm text-muted-foreground">키오스크 연동형 스마트 보건일지 시스템</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4 rounded-2xl border bg-card p-6 shadow-sm">

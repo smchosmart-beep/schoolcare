@@ -62,7 +62,7 @@ export default function Admin() {
               <Heart className="h-5 w-5 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-foreground">{schoolName} 보건일지</h1>
+              <h1 className="text-lg font-bold text-foreground">{schoolName} 스쿨케어</h1>
               <p className="text-xs text-muted-foreground">{user.email}</p>
             </div>
           </div>
