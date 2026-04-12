@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Heart, LogOut, Monitor, LayoutDashboard, Settings, FileText, Upload, BarChart3, Users } from "lucide-react";
+import { LogOut, Monitor, LayoutDashboard, Settings, FileText, Upload, BarChart3, Users } from "lucide-react";
+import schoolcareLogo from "@/assets/schoolcare-logo.png";
 
 import AdminDashboard from "@/components/admin/AdminDashboard";
 import SelfTreatmentSettings from "@/components/admin/SelfTreatmentSettings";
@@ -36,7 +37,7 @@ export default function Admin() {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="animate-pulse-gentle text-primary">
-          <Heart className="h-12 w-12" />
+          <img src={schoolcareLogo} alt="SchoolCare" className="h-12 w-12 rounded-xl" />
         </div>
       </div>
     );
@@ -58,9 +59,7 @@ export default function Admin() {
       <header className="border-b bg-card shadow-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary">
-              <Heart className="h-5 w-5 text-primary-foreground" />
-            </div>
+            <img src={schoolcareLogo} alt="SchoolCare" className="h-10 w-10 rounded-xl" />
             <div>
               <h1 className="text-lg font-bold text-foreground">{schoolName} 스쿨케어</h1>
               <p className="text-xs text-muted-foreground">{user.email}</p>

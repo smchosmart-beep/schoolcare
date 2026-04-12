@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Heart, UserPlus } from "lucide-react";
+import { UserPlus } from "lucide-react";
+import schoolcareLogo from "@/assets/schoolcare-logo.png";
 
 const translateAuthError = (message: string): string => {
   if (message.includes("weak") || message.includes("easy to guess")) {
@@ -60,9 +61,7 @@ export default function Signup() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary">
-            <Heart className="h-8 w-8 text-primary-foreground" />
-          </div>
+          <img src={schoolcareLogo} alt="SchoolCare" className="mx-auto mb-4 h-16 w-16 rounded-2xl" />
           <h1 className="text-2xl font-bold text-foreground">보건교사 회원가입</h1>
           <p className="mt-1 text-sm text-muted-foreground">새 계정을 만들어 시작하세요</p>
         </div>
