@@ -4,7 +4,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { loadStudents, getGrades, getClasses, getStudentsInClass, type Student } from "@/lib/students";
 import { toast } from "sonner";
-import { Heart, Stethoscope, ArrowLeft, Users, Clock, Settings } from "lucide-react";
+import { Stethoscope, ArrowLeft, Users, Clock, Settings } from "lucide-react";
+import schoolcareLogo from "@/assets/schoolcare-logo.png";
 import StudentUpload from "@/components/admin/StudentUpload";
 import ExpiredNotice from "@/components/ExpiredNotice";
 
@@ -195,7 +196,7 @@ export default function Kiosk() {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="animate-pulse text-primary">
-          <Heart className="h-12 w-12" />
+          <img src={schoolcareLogo} alt="SchoolCare" className="h-12 w-12 rounded-xl" />
         </div>
       </div>
     );
@@ -214,7 +215,7 @@ export default function Kiosk() {
       <div className="flex min-h-screen flex-col bg-background">
         <header className="flex items-center justify-between border-b bg-primary px-6 py-4">
           <div className="flex items-center gap-3">
-            <Heart className="h-8 w-8 text-primary-foreground" />
+            <img src={schoolcareLogo} alt="SchoolCare" className="h-8 w-8 rounded-lg" />
             <h1 className="text-xl font-bold text-primary-foreground">보건실 키오스크</h1>
           </div>
           <button
@@ -227,7 +228,7 @@ export default function Kiosk() {
         </header>
         <div className="mx-auto w-full max-w-2xl p-6">
           <div className="mb-6 rounded-2xl border border-primary/20 bg-accent p-6 text-center">
-            <Heart className="mx-auto mb-3 h-12 w-12 text-primary" />
+            <img src={schoolcareLogo} alt="SchoolCare" className="mx-auto mb-3 h-12 w-12 rounded-xl" />
             <h2 className="text-xl font-bold text-foreground">학생 명단을 먼저 업로드해주세요</h2>
             <p className="mt-2 text-sm text-muted-foreground">
               키오스크를 사용하려면 이 기기에 학생 명단이 필요합니다.
@@ -246,7 +247,7 @@ export default function Kiosk() {
         {/* Header */}
         <header className="flex items-center justify-between border-b bg-primary px-6 py-4">
           <div className="flex items-center gap-3">
-            <Heart className="h-8 w-8 text-primary-foreground" />
+            <img src={schoolcareLogo} alt="SchoolCare" className="h-8 w-8 rounded-lg" />
             <h1 className="text-xl font-bold text-primary-foreground">보건실</h1>
           </div>
           <div className="flex items-center gap-3">
@@ -274,7 +275,7 @@ export default function Kiosk() {
                 className="group flex flex-col items-center gap-4 rounded-3xl border-2 border-primary/20 bg-card p-10 shadow-sm transition-all hover:border-primary hover:shadow-lg active:scale-[0.98]"
               >
                 <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-accent">
-                  <Heart className="h-10 w-10 text-primary" />
+                  <img src={schoolcareLogo} alt="SchoolCare" className="h-10 w-10 rounded-xl" />
                 </div>
                 <span className="text-2xl font-bold text-foreground">스스로 치료</span>
                 <span className="text-sm text-muted-foreground">간단한 처치를 직접 할 수 있어요</span>

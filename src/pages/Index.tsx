@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { Heart } from "lucide-react";
+import schoolcareLogo from "@/assets/schoolcare-logo.png";
 
 export default function Index() {
   const { user, loading } = useAuth();
@@ -16,7 +16,7 @@ export default function Index() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="animate-pulse-gentle text-primary">
-        <Heart className="h-12 w-12" />
+        <img src={schoolcareLogo} alt="SchoolCare" className="h-12 w-12 rounded-xl" />
       </div>
     </div>
   );

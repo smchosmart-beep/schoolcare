@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Trash2, ClipboardList, Heart, Stethoscope, Clock, Plus } from "lucide-react";
+import { Trash2, ClipboardList, Stethoscope, Clock, Plus } from "lucide-react";
+import schoolcareLogo from "@/assets/schoolcare-logo.png";
 import VisitRecordModal from "./VisitRecordModal";
 import DirectVisitDialog from "./DirectVisitDialog";
 import { Student } from "@/lib/students";
@@ -249,7 +250,7 @@ export default function AdminDashboard({ teacherId }: Props) {
         {/* Self Treatments */}
         <div className="rounded-2xl border bg-card p-6 shadow-sm">
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-foreground">
-            <Heart className="h-5 w-5 text-primary" />
+            <img src={schoolcareLogo} alt="SchoolCare" className="h-5 w-5 rounded" />
             스스로 치료
             <span className="ml-auto text-sm text-muted-foreground">{selfVisits.length}건</span>
           </h2>
