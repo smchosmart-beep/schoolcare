@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { LogOut, Monitor, LayoutDashboard, Settings, FileText, Upload, BarChart3, Users } from "lucide-react";
-import schoolcareLogo from "@/assets/schoolcare-logo.png";
+import schoolcareLogo from "@/assets/favicon-logo.png";
 
 import AdminDashboard from "@/components/admin/AdminDashboard";
 import SelfTreatmentSettings from "@/components/admin/SelfTreatmentSettings";

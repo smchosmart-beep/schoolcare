@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { loadStudents, getGrades, getClasses, getStudentsInClass, type Student } from "@/lib/students";
 import { toast } from "sonner";
 import { Stethoscope, ArrowLeft, Users, Clock, Settings } from "lucide-react";
-import schoolcareLogo from "@/assets/schoolcare-logo.png";
+import schoolcareLogo from "@/assets/favicon-logo.png";
 import StudentUpload from "@/components/admin/StudentUpload";
 import ExpiredNotice from "@/components/ExpiredNotice";
 

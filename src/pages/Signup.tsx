@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { UserPlus } from "lucide-react";
-import schoolcareLogo from "@/assets/schoolcare-logo.png";
+import schoolcareLogo from "@/assets/favicon-logo.png";
 
 const translateAuthError = (message: string): string => {
   if (message.includes("weak") || message.includes("easy to guess")) {
