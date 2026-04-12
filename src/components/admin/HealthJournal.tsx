@@ -97,17 +97,22 @@ export default function HealthJournal({ teacherId }: Props) {
     상태: v.status === "completed" ? "완료" : "진행중",
   });
 
-  const applyColumnWidths = (ws: XLSX.WorkSheet, rows: Record<string, any>[]) => {
-    if (rows.length === 0) return;
-    const colWidths = Object.keys(rows[0]).map((key) => ({
-      wch: Math.max(key.length * 2, ...rows.map((r) => String(r[key]).length * 1.5)),
-    }));
-    if (colWidths[5]) colWidths[5].wch = Math.max(colWidths[5].wch, 7);
-    if (colWidths[6]) colWidths[6].wch = Math.max(colWidths[6].wch, 15);
-    if (colWidths[7]) colWidths[7].wch = Math.max(colWidths[7].wch, 25);
-    if (colWidths[9]) colWidths[9].wch = Math.max(colWidths[9].wch, 65);
-    if (colWidths[10]) colWidths[10].wch = Math.max(colWidths[10].wch, 30);
-    ws["!cols"] = colWidths;
+  const applyColumnWidths = (ws: XLSX.WorkSheet) => {
+    ws["!cols"] = [
+      { wch: 12 },  // 날짜
+      { wch: 8 },   // 시간
+      { wch: 5 },   // 학년
+      { wch: 5 },   // 반
+      { wch: 5 },   // 번호
+      { wch: 7 },   // 이름
+      { wch: 15 },  // 유형
+      { wch: 25 },  // 스스로 치료 항목
+      { wch: 25 },  // 건강문제
+      { wch: 65 },  // 처치 및 조치
+      { wch: 30 },  // 투약내용
+      { wch: 6 },   // 체온
+      { wch: 8 },   // 상태
+    ];
   };
 
   const handleExport = () => {
