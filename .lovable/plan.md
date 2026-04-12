@@ -1,30 +1,27 @@
 
 
-# 월별 엑셀 다운로드 시 주차별 시트 분리
+# 이용 현황 탭 엑셀 다운로드 + 빠른 기간 설정
 
 ## 변경 파일
-`src/components/admin/HealthJournal.tsx` — `handleExport` 함수의 monthly 분기 추가
+`src/components/admin/VisitStatistics.tsx`
 
 ## 변경 내용
-현재 monthly 모드는 `else` 분기에서 단일 시트로 내보내고 있음. 이를 weekly처럼 주차별 시트로 분리.
 
-- `date-fns`에서 `getWeekOfMonth`를 import 추가
-- `viewMode === "monthly"` 전용 분기 추가:
-  - 해당 월의 시작일~종료일을 구함
-  - 월요일 기준으로 1주차~5주차(해당 시) 그룹핑
-  - 각 주차별로 `1주차`, `2주차`, `3주차`, `4주차`, (필요시 `5주차`) 시트 생성
-  - 각 시트에 해당 주차 방문 기록만 포함, 없으면 빈 행 표시
-  - `applyColumnWidths` 적용
-- 파일명: `보건일지_월간_yyyy년MM월.xlsx`
+### 1. 빠른 기간 설정 버튼 추가
+기간 설정 카드에 월별/연도별 빠른 선택 버튼 추가:
+- **월별**: 이번 달, 지난달, 2개월 전 등 최근 몇 개월 버튼 + 월 선택기
+- **연도별**: 올해, 작년 버튼
+- 버튼 클릭 시 `startDate`/`endDate` 자동 설정 후 `handleSearch` 자동 호출
 
-### 주차 계산 로직
-월 시작일부터 월요일 기준으로 주차를 나눔:
-```typescript
-// 월의 첫 번째 월요일 기준으로 주차 그룹 생성
-const monthStart = startOfMonth(currentDate);
-const monthEnd = endOfMonth(currentDate);
-// 1주차: 1일~첫째주 일요일, 2주차: 다음 월~일, ...
+```
+[이번 달] [지난달] [올해] [작년]  ← 빠른 선택 버튼
+시작일 [____] ~ 종료일 [____]  [조회]  ← 기존 캘린더 유지
 ```
 
-각 visit의 `visited_at`이 어느 주에 속하는지 판단하여 시트 분배.
+### 2. 엑셀 다운로드 기능 추가
+- 조회 결과가 있을 때 "엑셀 다운로드" 버튼 표시
+- `xlsx` 라이브러리 사용 (이미 프로젝트에 설치됨)
+- 시트 내용: 날짜, 요일, 스스로 치료, 선생님 치료, 합계 + 마지막 행에 합계
+- 고정 열너비 적용 (HealthJournal과 동일 패턴)
+- 파일명: `이용현황_yyyy-MM-dd~yyyy-MM-dd.xlsx`
 
