@@ -43,21 +43,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
 
         if (session?.user && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
-          await checkApprovalAndRole(session.user.id);
+          checkApprovalAndRole(session.user.id).then(() => setLoading(false));
+        } else {
+          if (event === "SIGNED_OUT") {
+            setApproved(null);
+            setIsAdmin(false);
+            setExpiresAt(null);
+          }
+          setLoading(false);
         }
-
-        if (event === "SIGNED_OUT") {
-          setApproved(null);
-          setIsAdmin(false);
-          setExpiresAt(null);
-        }
-
-        setLoading(false);
       }
     );
 
