@@ -19,10 +19,17 @@ export default function ExpiredNotice() {
           <AlertTriangle className="h-10 w-10 text-destructive" />
         </div>
         <h1 className="text-2xl font-bold text-foreground mb-2">사용 기간 만료</h1>
-        <p className="text-muted-foreground mb-8">
+        <p className="text-muted-foreground mb-4">
           사용 기간이 만료되었습니다.<br />
           관리자에게 사용 기간 연장을 요청하세요.
         </p>
+        <a
+          href="tel:010-5168-3210"
+          className="inline-flex items-center gap-2 text-primary font-medium mb-8"
+        >
+          <Phone className="h-4 w-4" />
+          010-5168-3210
+        </a>
         <Button variant="outline" className="gap-2" onClick={handleSignOut}>
           <LogOut className="h-4 w-4" />
           로그아웃
