@@ -130,7 +130,7 @@ export default function HealthJournal({ teacherId }: Props) {
           ? dayVisits.map(formatVisitRow)
           : [{ 날짜: format(day, "yyyy-MM-dd"), 시간: "", 학년: "", 반: "", 번호: "", 이름: "기록 없음", 유형: "", "스스로 치료 항목": "", 건강문제: "", "처치 및 조치": "", 투약내용: "", 상태: "" }];
         const ws = XLSX.utils.json_to_sheet(rows);
-        applyColumnWidths(ws, rows);
+        applyColumnWidths(ws);
         XLSX.utils.book_append_sheet(wb, ws, sheetName);
       }
 
@@ -139,7 +139,7 @@ export default function HealthJournal({ teacherId }: Props) {
     } else {
       const rows = visits.map(formatVisitRow);
       const ws = XLSX.utils.json_to_sheet(rows);
-      applyColumnWidths(ws, rows);
+      applyColumnWidths(ws);
       XLSX.utils.book_append_sheet(wb, ws, "보건일지");
       XLSX.writeFile(wb, `보건일지_${format(currentDate, "yyyyMMdd")}.xlsx`);
     }
