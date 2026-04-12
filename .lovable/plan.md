@@ -1,38 +1,30 @@
 
 
-# 엑셀 다운로드 열너비 통일
-
-## 문제
-`applyColumnWidths` 함수가 데이터 내용 길이에 따라 동적으로 열너비를 계산하므로, 데이터가 적은 주별/월별 시트에서는 열이 좁게 나옴.
-
-## 해결
-`applyColumnWidths` 함수를 수정하여 **고정 열너비**를 사용. 데이터 양에 관계없이 A~K열(날짜, 시간, 학년, 반, 번호, 이름, 유형, 스스로 치료 항목, 건강문제, 처치 및 조치, 투약내용, 체온, 상태)이 항상 동일한 너비로 출력되도록 변경.
+# 월별 엑셀 다운로드 시 주차별 시트 분리
 
 ## 변경 파일
-`src/components/admin/HealthJournal.tsx` — `applyColumnWidths` 함수만 수정
+`src/components/admin/HealthJournal.tsx` — `handleExport` 함수의 monthly 분기 추가
 
 ## 변경 내용
-동적 계산 로직을 제거하고 고정 열너비 배열로 교체:
+현재 monthly 모드는 `else` 분기에서 단일 시트로 내보내고 있음. 이를 weekly처럼 주차별 시트로 분리.
 
+- `date-fns`에서 `getWeekOfMonth`를 import 추가
+- `viewMode === "monthly"` 전용 분기 추가:
+  - 해당 월의 시작일~종료일을 구함
+  - 월요일 기준으로 1주차~5주차(해당 시) 그룹핑
+  - 각 주차별로 `1주차`, `2주차`, `3주차`, `4주차`, (필요시 `5주차`) 시트 생성
+  - 각 시트에 해당 주차 방문 기록만 포함, 없으면 빈 행 표시
+  - `applyColumnWidths` 적용
+- 파일명: `보건일지_월간_yyyy년MM월.xlsx`
+
+### 주차 계산 로직
+월 시작일부터 월요일 기준으로 주차를 나눔:
 ```typescript
-const applyColumnWidths = (ws: XLSX.WorkSheet) => {
-  ws["!cols"] = [
-    { wch: 12 },  // 날짜
-    { wch: 8 },   // 시간
-    { wch: 5 },   // 학년
-    { wch: 5 },   // 반
-    { wch: 5 },   // 번호
-    { wch: 7 },   // 이름
-    { wch: 15 },  // 유형
-    { wch: 25 },  // 스스로 치료 항목
-    { wch: 25 },  // 건강문제
-    { wch: 65 },  // 처치 및 조치
-    { wch: 30 },  // 투약내용
-    { wch: 6 },   // 체온
-    { wch: 8 },   // 상태
-  ];
-};
+// 월의 첫 번째 월요일 기준으로 주차 그룹 생성
+const monthStart = startOfMonth(currentDate);
+const monthEnd = endOfMonth(currentDate);
+// 1주차: 1일~첫째주 일요일, 2주차: 다음 월~일, ...
 ```
 
-호출부의 `applyColumnWidths(ws, rows)` → `applyColumnWidths(ws)`로 변경 (2곳).
+각 visit의 `visited_at`이 어느 주에 속하는지 판단하여 시트 분배.
 
