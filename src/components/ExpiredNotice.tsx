@@ -30,6 +30,7 @@ export default function ExpiredNotice() {
           <Phone className="h-4 w-4" />
           010-5168-3210
         </a>
+        <div className="mb-8" />
         <Button variant="outline" className="gap-2" onClick={handleSignOut}>
           <LogOut className="h-4 w-4" />
           로그아웃
