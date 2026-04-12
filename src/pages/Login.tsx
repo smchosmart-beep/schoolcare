@@ -82,7 +82,7 @@ export default function Login() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <img src={schoolcareLogo} alt="SchoolCare" className="mx-auto mb-4 h-20 w-20 rounded-2xl" />
+          <img src={schoolcareLogo} alt="SchoolCare" className="mx-auto mb-4 h-32 w-32 rounded-2xl" />
           <h1 className="text-2xl font-bold text-foreground">스쿨케어 (SchoolCare)</h1>
           <p className="mt-1 text-sm text-muted-foreground">키오스크 연동형 스마트 보건일지 시스템</p>
         </div>
