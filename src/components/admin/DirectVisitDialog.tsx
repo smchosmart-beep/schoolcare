@@ -90,7 +90,7 @@ export default function DirectVisitDialog({ open, onClose, onSelect }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>학생 검색</DialogTitle>
         </DialogHeader>
@@ -116,17 +116,17 @@ export default function DirectVisitDialog({ open, onClose, onSelect }: Props) {
                 <div className="text-sm font-medium text-foreground">
                   {selectedClass.grade}학년 {selectedClass.class}반
                 </div>
-                <div className="max-h-72 overflow-y-auto space-y-1">
+                <div className="grid grid-cols-5 gap-2">
                   {studentsInClass.map((s) => (
                     <button
                       key={`${s.grade}-${s.class}-${s.number}`}
                       onClick={() => handleSelect(s)}
-                      className="flex w-full items-center gap-3 rounded-lg border bg-background p-3 text-left transition-colors hover:bg-accent"
+                      className="flex flex-col items-center justify-center gap-1 rounded-lg border bg-background p-3 text-center transition-colors hover:bg-accent"
                     >
-                      <span className="text-xs text-muted-foreground whitespace-nowrap">
+                      <span className="text-xs text-muted-foreground">
                         {s.number}번
                       </span>
-                      <span className="font-medium text-foreground">{s.name}</span>
+                      <span className="font-medium text-foreground truncate w-full">{s.name}</span>
                     </button>
                   ))}
                 </div>
