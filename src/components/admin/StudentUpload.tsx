@@ -1,9 +1,9 @@
 import { useState, useRef } from "react";
-import { loadStudents, saveStudents, addStudent, removeStudent, type Student } from "@/lib/students";
+import { loadStudents, saveStudents, addStudent, removeStudent, sortClasses, loadClassOrder, saveClassOrder, clearClassOrder, type Student } from "@/lib/students";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Upload, Download, FileSpreadsheet, Trash2, Users, Plus, Search, X } from "lucide-react";
+import { Upload, Download, FileSpreadsheet, Trash2, Users, Plus, Search, X, ArrowUp, ArrowDown, ListOrdered } from "lucide-react";
 import * as XLSX from "xlsx";
 
 interface StudentUploadProps {
@@ -130,6 +130,23 @@ export default function StudentUpload({ onUploadComplete }: StudentUploadProps =
   };
 
   const grades = [...new Set(students.map((s) => s.grade))].sort((a, b) => a - b);
+  const allClasses = sortClasses([...new Set(students.map((s) => s.class))]);
+
+  const moveClass = (idx: number, dir: -1 | 1) => {
+    const next = [...allClasses];
+    const j = idx + dir;
+    if (j < 0 || j >= next.length) return;
+    [next[idx], next[j]] = [next[j], next[idx]];
+    saveClassOrder(next);
+    setStudents([...students]);
+    toast.success("반 순서를 변경했습니다.");
+  };
+
+  const resetClassOrder = () => {
+    clearClassOrder();
+    setStudents([...students]);
+    toast.info("반 순서를 가나다순으로 초기화했습니다.");
+  };
 
   const filteredStudents = searchQuery.trim()
     ? students.filter(
@@ -315,7 +332,7 @@ export default function StudentUpload({ onUploadComplete }: StudentUploadProps =
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {grades.map((g) => {
               const gradeStudents = students.filter((s) => s.grade === g);
-              const classes = [...new Set(gradeStudents.map((s) => s.class))].sort((a, b) => a.localeCompare(b));
+              const classes = sortClasses([...new Set(gradeStudents.map((s) => s.class))]);
               return (
                 <div key={g} className="rounded-xl border bg-background p-4">
                   <p className="mb-2 font-semibold text-foreground">{g}학년</p>
