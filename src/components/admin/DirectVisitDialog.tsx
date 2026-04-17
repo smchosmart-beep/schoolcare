@@ -19,7 +19,7 @@ interface Props {
 
 export default function DirectVisitDialog({ open, onClose, onSelect }: Props) {
   const [search, setSearch] = useState("");
-  const [mode, setMode] = useState<"grade" | "name">("grade");
+  const [mode, setMode] = useState<"grade" | "name">("name");
   const [selectedClass, setSelectedClass] = useState<{ grade: number; class: string } | null>(null);
 
   const students = useMemo(() => loadStudents(), [open]);
@@ -57,7 +57,7 @@ export default function DirectVisitDialog({ open, onClose, onSelect }: Props) {
 
   const resetState = () => {
     setSearch("");
-    setMode("grade");
+    setMode("name");
     setSelectedClass(null);
   };
 
@@ -97,8 +97,8 @@ export default function DirectVisitDialog({ open, onClose, onSelect }: Props) {
 
         <Tabs value={mode} onValueChange={(v) => setMode(v as "grade" | "name")}>
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="grade">학년·반 선택</TabsTrigger>
             <TabsTrigger value="name">이름 검색</TabsTrigger>
+            <TabsTrigger value="grade">학년·반 선택</TabsTrigger>
           </TabsList>
 
           <TabsContent value="grade" className="mt-4">
