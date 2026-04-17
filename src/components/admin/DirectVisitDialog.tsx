@@ -90,7 +90,7 @@ export default function DirectVisitDialog({ open, onClose, onSelect }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>학생 검색</DialogTitle>
         </DialogHeader>
