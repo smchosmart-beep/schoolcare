@@ -321,6 +321,50 @@ export default function StudentUpload({ onUploadComplete }: StudentUploadProps =
         </div>
       )}
 
+      {/* 반 순서 설정 */}
+      {students.length > 0 && allClasses.length > 1 && (
+        <div className="rounded-2xl border bg-card p-6 shadow-sm">
+          <h3 className="mb-2 flex items-center gap-2 text-lg font-semibold text-foreground">
+            <ListOrdered className="h-5 w-5 text-primary" />
+            반 순서 설정
+          </h3>
+          <p className="mb-4 text-sm text-muted-foreground">
+            학교에서 정한 반 순서대로 조정하세요. 직접 기록 다이얼로그와 학생 명단에 반영됩니다.
+          </p>
+          <div className="space-y-2">
+            {allClasses.map((c, idx) => (
+              <div key={c} className="flex items-center gap-2 rounded-lg border bg-background p-2">
+                <span className="w-6 text-center text-xs text-muted-foreground">{idx + 1}</span>
+                <span className="flex-1 font-medium text-foreground">{c}반</span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  disabled={idx === 0}
+                  onClick={() => moveClass(idx, -1)}
+                  aria-label="위로"
+                >
+                  <ArrowUp className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  disabled={idx === allClasses.length - 1}
+                  onClick={() => moveClass(idx, 1)}
+                  aria-label="아래로"
+                >
+                  <ArrowDown className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+          <Button variant="outline" size="sm" className="mt-4" onClick={resetClassOrder}>
+            기본(가나다)순으로 초기화
+          </Button>
+        </div>
+      )}
+
       {/* Summary */}
       {students.length > 0 && (
         <div className="rounded-2xl border bg-card p-6 shadow-sm">
