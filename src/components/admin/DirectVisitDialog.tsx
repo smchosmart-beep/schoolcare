@@ -157,9 +157,9 @@ export default function DirectVisitDialog({ open, onClose, onSelect }: Props) {
                               <button
                                 disabled={!exists}
                                 onClick={() => setSelectedClass({ grade: g, class: c })}
-                                className="w-full rounded p-2 text-foreground transition-colors hover:bg-accent disabled:bg-muted disabled:text-muted-foreground/40 disabled:cursor-not-allowed"
+                                className="w-full rounded p-2 font-medium text-foreground transition-colors hover:bg-accent disabled:bg-muted disabled:text-muted-foreground/40 disabled:cursor-not-allowed"
                               >
-                                {exists ? "선택" : "-"}
+                                {exists ? `${g}-${c}` : "-"}
                               </button>
                             </td>
                           );
