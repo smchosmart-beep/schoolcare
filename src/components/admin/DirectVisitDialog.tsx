@@ -8,7 +8,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { loadStudents, Student } from "@/lib/students";
+import { loadStudents, Student, sortClasses } from "@/lib/students";
 import { Search, ArrowLeft } from "lucide-react";
 
 interface Props {
@@ -35,7 +35,7 @@ export default function DirectVisitDialog({ open, onClose, onSelect }: Props) {
     });
     return {
       grades: Array.from(gSet).sort((a, b) => a - b),
-      classes: Array.from(cSet).sort((a, b) => a.localeCompare(b, "ko")),
+      classes: sortClasses(Array.from(cSet)),
       classMap: map,
     };
   }, [students]);

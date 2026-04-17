@@ -43,6 +43,33 @@ export function addStudent(student: Student): { success: boolean; message: strin
   return { success: true, message: `${student.name} 학생을 추가했습니다.` };
 }
 
+const CLASS_ORDER_KEY = "health-journal-class-order";
+
+export function loadClassOrder(): string[] {
+  const data = localStorage.getItem(CLASS_ORDER_KEY);
+  return data ? JSON.parse(data) : [];
+}
+
+export function saveClassOrder(order: string[]) {
+  localStorage.setItem(CLASS_ORDER_KEY, JSON.stringify(order));
+}
+
+export function clearClassOrder() {
+  localStorage.removeItem(CLASS_ORDER_KEY);
+}
+
+export function sortClasses(classes: string[]): string[] {
+  const saved = loadClassOrder();
+  return [...classes].sort((a, b) => {
+    const ia = saved.indexOf(a);
+    const ib = saved.indexOf(b);
+    if (ia !== -1 && ib !== -1) return ia - ib;
+    if (ia !== -1) return -1;
+    if (ib !== -1) return 1;
+    return a.localeCompare(b, "ko");
+  });
+}
+
 export function removeStudent(grade: number, cls: string, number: number): Student[] {
   const students = loadStudents();
   const filtered = students.filter(
