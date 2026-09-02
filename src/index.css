@@ -103,3 +103,26 @@
     touch-action: manipulation;
   }
 }
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  body {
+    background: white;
+  }
+  .print-area {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+  .print-area table {
+    font-size: 11px;
+  }
+  .print-area thead {
+    display: table-header-group;
+  }
+}

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { LogOut, Monitor, LayoutDashboard, Settings, FileText, Upload, BarChart3, Users } from "lucide-react";
+import { LogOut, Monitor, LayoutDashboard, Settings, FileText, Upload, BarChart3, Users, UserSearch } from "lucide-react";
 import schoolcareLogo from "@/assets/favicon-logo.png";
 
 import AdminDashboard from "@/components/admin/AdminDashboard";
@@ -12,6 +12,7 @@ import StudentUpload from "@/components/admin/StudentUpload";
 import HealthJournal from "@/components/admin/HealthJournal";
 import VisitStatistics from "@/components/admin/VisitStatistics";
 import UserManagement from "@/components/admin/UserManagement";
+import StudentRecords from "@/components/admin/StudentRecords";
 import ExpiredNotice from "@/components/ExpiredNotice";
 
 export default function Admin() {
@@ -51,12 +52,12 @@ export default function Admin() {
   }
 
   const schoolName = user.user_metadata?.school_name || "보건실";
-  const tabCount = isAdmin ? 6 : 5;
+  const tabCount = isAdmin ? 7 : 6;
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b bg-card shadow-sm">
+      <header className="no-print border-b bg-card shadow-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
           <div className="flex items-center gap-3">
             <img src={schoolcareLogo} alt="SchoolCare" className="h-10 w-10 rounded-xl" />
@@ -80,7 +81,7 @@ export default function Admin() {
       {/* Content */}
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className={`grid w-full lg:w-auto lg:inline-grid`} style={{ gridTemplateColumns: `repeat(${tabCount}, minmax(0, 1fr))` }}>
+          <TabsList className={`no-print grid w-full lg:w-auto lg:inline-grid`} style={{ gridTemplateColumns: `repeat(${tabCount}, minmax(0, 1fr))` }}>
             <TabsTrigger value="dashboard" className="gap-2">
               <LayoutDashboard className="h-4 w-4" />
               <span className="hidden sm:inline">대시보드</span>
@@ -96,6 +97,10 @@ export default function Admin() {
             <TabsTrigger value="journal" className="gap-2">
               <FileText className="h-4 w-4" />
               <span className="hidden sm:inline">보건일지</span>
+            </TabsTrigger>
+            <TabsTrigger value="records" className="gap-2">
+              <UserSearch className="h-4 w-4" />
+              <span className="hidden sm:inline">방문기록</span>
             </TabsTrigger>
             <TabsTrigger value="statistics" className="gap-2">
               <BarChart3 className="h-4 w-4" />
@@ -120,6 +125,9 @@ export default function Admin() {
           </TabsContent>
           <TabsContent value="journal">
             <HealthJournal teacherId={user.id} />
+          </TabsContent>
+          <TabsContent value="records">
+            <StudentRecords teacherId={user.id} />
           </TabsContent>
           <TabsContent value="statistics">
             <VisitStatistics teacherId={user.id} />
