@@ -13,6 +13,7 @@ import HealthJournal from "@/components/admin/HealthJournal";
 import VisitStatistics from "@/components/admin/VisitStatistics";
 import UserManagement from "@/components/admin/UserManagement";
 import StudentRecords from "@/components/admin/StudentRecords";
+import NeisImport from "@/components/admin/NeisImport";
 import ExpiredNotice from "@/components/ExpiredNotice";
 
 export default function Admin() {
@@ -121,7 +122,10 @@ export default function Admin() {
             <SelfTreatmentSettings teacherId={user.id} />
           </TabsContent>
           <TabsContent value="upload">
-            <StudentUpload />
+            <div className="space-y-6">
+              <StudentUpload />
+              <NeisImport teacherId={user.id} />
+            </div>
           </TabsContent>
           <TabsContent value="journal">
             <HealthJournal teacherId={user.id} />
