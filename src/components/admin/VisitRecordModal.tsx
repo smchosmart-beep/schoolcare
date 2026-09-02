@@ -38,16 +38,23 @@ interface Props {
   open: boolean;
   onClose: () => void;
   visit: Visit | null;
-  onSave: (data: { health_issue: string; treatment: string; medication: string; temperature: string }) => void;
+  onSave: (data: { health_issue: string; treatment: string; medication: string; temperature: string; visitedAt: string }) => void;
   onDelete?: (visitId: string) => void;
   teacherId: string;
 }
+
+const toDatetimeLocal = (iso: string) => {
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
 
 export default function VisitRecordModal({ open, onClose, visit, onSave, onDelete, teacherId }: Props) {
   const [healthIssue, setHealthIssue] = useState("");
   const [treatment, setTreatment] = useState("");
   const [medication, setMedication] = useState("");
   const [temperature, setTemperature] = useState("");
+  const [visitedAt, setVisitedAt] = useState("");
   const [presets, setPresets] = useState<Preset[]>([]);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [history, setHistory] = useState<HistoryRecord[]>([]);
@@ -91,6 +98,7 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, onDelet
       setTreatment(visit.treatment || "");
       setMedication(visit.medication || "");
       setTemperature(visit.temperature || "");
+      setVisitedAt(toDatetimeLocal(visit.visited_at));
     }
   }, [visit]);
 
@@ -142,9 +150,15 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, onDelet
             <DialogTitle className="text-lg">
               {visit.student_name} ({visit.student_grade}학년 {visit.student_class}반 {visit.student_number}번)
             </DialogTitle>
-            <p className="text-sm text-muted-foreground">
-              방문 시간: {new Date(visit.visited_at).toLocaleString("ko-KR")}
-            </p>
+            <div className="flex items-center gap-2">
+              <Label className="text-sm text-muted-foreground whitespace-nowrap">방문 일시</Label>
+              <Input
+                type="datetime-local"
+                value={visitedAt}
+                onChange={(e) => setVisitedAt(e.target.value)}
+                className="w-[210px] h-8 text-sm"
+              />
+            </div>
           </DialogHeader>
 
           <div className="flex gap-6">
@@ -333,7 +347,7 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, onDelet
               <Button variant="outline" onClick={onClose}>
                 취소
               </Button>
-              <Button onClick={() => onSave({ health_issue: healthIssue, treatment, medication, temperature })}>
+              <Button onClick={() => onSave({ health_issue: healthIssue, treatment, medication, temperature, visitedAt })}>
                 저장
               </Button>
             </div>
