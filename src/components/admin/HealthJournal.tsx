@@ -197,9 +197,15 @@ export default function HealthJournal({ teacherId }: Props) {
     setModalOpen(true);
   };
 
-  const handleSave = async (data: { health_issue: string; treatment: string; medication: string; temperature: string }) => {
+  const handleSave = async (data: { health_issue: string; treatment: string; medication: string; temperature: string; visitedAt: string }) => {
     if (!selectedVisit) return;
-    const updateData: { health_issue: string; treatment: string; medication: string; temperature: string; visit_type?: string } = { ...data };
+    const updateData: { health_issue: string; treatment: string; medication: string; temperature: string; visit_type?: string; visited_at: string } = {
+      health_issue: data.health_issue,
+      treatment: data.treatment,
+      medication: data.medication,
+      temperature: data.temperature,
+      visited_at: new Date(data.visitedAt).toISOString(),
+    };
     if (selectedVisit.visit_type === "self_treatment" && data.health_issue?.trim()) {
       updateData.visit_type = "teacher_visit";
     }

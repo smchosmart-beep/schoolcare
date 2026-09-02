@@ -159,8 +159,9 @@ export default function AdminDashboard({ teacherId }: Props) {
     setModalOpen(true);
   };
 
-  const handleSaveVisit = async (data: { health_issue: string; treatment: string; medication: string; temperature: string }) => {
+  const handleSaveVisit = async (data: { health_issue: string; treatment: string; medication: string; temperature: string; visitedAt: string }) => {
     if (!selectedVisit) return;
+    const visitDate = new Date(data.visitedAt);
     await supabase
       .from("visits")
       .update({
@@ -169,9 +170,16 @@ export default function AdminDashboard({ teacherId }: Props) {
         medication: data.medication,
         temperature: data.temperature || null,
         status: "completed",
+        visited_at: visitDate.toISOString(),
       })
       .eq("id", selectedVisit.id);
-    toast.success("기록이 저장되었습니다.");
+    const todayMid = new Date();
+    todayMid.setHours(0, 0, 0, 0);
+    if (visitDate < todayMid) {
+      toast.success("기록이 저장되었습니다. 과거 날짜 기록은 방문기록 탭에서 확인할 수 있습니다.");
+    } else {
+      toast.success("기록이 저장되었습니다.");
+    }
     setModalOpen(false);
     fetchData();
   };
