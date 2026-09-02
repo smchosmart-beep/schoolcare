@@ -1,54 +1,40 @@
-# README.md 작성 계획
+# 학생별 방문 기록 조회 및 인쇄 기능
 
-## 프로젝트 개요
-스쿨케어(SchoolCare)는 초등학교 보건실을 위한 키오스크 연동형 스마트 보건일지 시스템입니다. 보건교사의 관리(Admin) 화면과 학생들이 직접 사용하는 키오스크(Kiosk) 화면으로 구성되어 있습니다.
+## 목표
+관리자가 학생 이름을 검색해 해당 학생의 보건실 방문 기록 전체를 모아보고, 인쇄(또는 PDF 저장)할 수 있게 한다.
 
-## README에 포함할 내용
+## 변경 내용
 
-### 1. 소개 (Introduction)
-- 서비스명: 스쿨케어 (SchoolCare)
-- 설명: 키오스크 연동형 스마트 보건일지 시스템
-- 대상: 초등학교 보건교사 및 학생
+### 1. 신규 컴포넌트: `src/components/admin/StudentRecords.tsx`
+- **이름 검색**: 기존 `DirectVisitDialog`의 검색 방식 재사용 — `loadStudents()`로 명단을 불러와 2글자 이상 입력 시 이름/번호로 필터링, 학년·반·번호순 정렬해 결과 표시
+- **학생 선택 시 방문 기록 조회**: 기존 RPC `get_visits_decrypted`를 넓은 기간(예: 최근 1년 또는 전체)으로 호출한 뒤 해당 학생(이름+학년+반+번호 일치)만 필터링
+- **요약 정보**: 총 방문 횟수, 최근 방문일, 자주 나타난 증상 상위 표시
+- **기록 목록**: 일시, 유형(선생님/스스로), 증상, 처치, 투약, 체온을 표 형태로 표시
 
-### 2. 핵심 기능
-- **키오스크 모드**: 학생이 학년→반→이름을 선택하여 보건선생님 만나기 또는 스스로 치료 기록
-- **보건교사 관리**: 대기열 관리, 직접 진료 기록, 보건일지 조회/엑셀 다운로드
-- **이용 현황 통계**: 월별/주별/일별 방문 통계 및 엑셀 다운로드
-- **학생 명단 관리**: NEIS 엑셀 업로드, 개별 추가/삭제, 반 순서 설정, 백업 다운로드
-- **사용자 관리**: 관리자 승인제 회원가입, 역할(교사/관리자), 사용 기간 설정
-- **학생 이름 DB 암호화**: PGP 대칭 암호화로 개인정보 보호
+### 2. 인쇄 기능
+- "인쇄하기" 버튼 클릭 시 `window.print()` 실행
+- 인쇄 전용 CSS(`@media print`) 추가: 화면의 탭·버튼·헤더는 숨기고, 인쇄 영역(학생 정보 + 기록 표)만 출력
+- 인쇄 상단에 문서 제목 포함: `○학년 ○반 ○번 ○○○ 보건실 방문 기록` + 인쇄일
+- 표는 A4 세로 기준에 맞춰 글자 크기·여백 조정, 페이지 넘김 시 표 헤더 반복(`thead` 자동 반복 활용)
+- 브라우저 인쇄 대화상자에서 "PDF로 저장"을 선택하면 PDF 출력도 가능
 
-### 3. 기술 스택
-- 프론트엔드: React 18, TypeScript 5, Vite 5, Tailwind CSS, shadcn/ui
-- 상태/데이터: TanStack Query, React Router
-- 백엔드: Lovable Cloud (Supabase) — 인증, Postgres DB, Row Level Security
-- 모바일: Capacitor (iOS/Android native app wrapper)
-- 테스트: Vitest, Playwright
+### 3. Admin 탭 추가: `src/pages/Admin.tsx`
+- "보건일지"와 "이용현황" 사이에 **"학생별 기록"** 탭 추가 (`UserSearch` 아이콘)
+- tabCount 5→6 (관리자는 6→7)로 조정
 
-### 4. 설치 및 실행
-- 개발 서버: `npm install` → `npm run dev`
-- 빌드: `npm run build`
-- 테스트: `npm test`
+## 데이터 흐름
+```text
+이름 검색(localStorage 명단)
+  → 학생 선택
+  → get_visits_decrypted(teacherId, 넓은 기간) 호출
+  → 해당 학생 기록만 필터 → 화면 표시
+  → [인쇄하기] → window.print() (@media print 스타일 적용)
+```
 
-### 5. 프로젝트 구조
-- `src/pages/`: 라우트 페이지 (Login, Signup, Admin, Kiosk, Index)
-- `src/components/admin/`: 관리자용 컴포넌트
-- `src/hooks/`: 인증 훅 등
-- `src/lib/`: 유틸리티 (학생 명단 localStorage 관리)
-- `supabase/migrations/`: DB 스키마 및 정책
+## 안전성
+- 기존 RPC와 localStorage 명단만 사용 — DB 스키마 변경 없음
+- 화면 UI에는 영향 없이 `@media print`에서만 스타일 분기
+- 기록이 없는 학생은 "방문 기록이 없습니다" 안내 표시
 
-### 6. 환경 변수
-- `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` (Lovable Cloud 자동 관리)
-
-### 7. 배포
-- Lovable 플랫폼에서 Publish/Update 버튼으로 프론트엔드 배포
-- 백엔드 마이그레이션은 자동 적용
-
-### 8. 라이선스
-- Private project
-
-## 변경 파일
-- `README.md` (신규 작성)
-
-## 변경 없음
-- 소스 코드, DB 마이그레이션, 의존성 추가 없음
+## 확인 사항
+- 조회 기간: 전체 기간 조회를 기본으로 할지, 최근 1년 등으로 제한할지 (기본: 전체 기간)
