@@ -1,11 +1,11 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { format, endOfMonth } from "date-fns";
 import { ko } from "date-fns/locale";
-import { Search, Printer, UserSearch } from "lucide-react";
+import { Search, Printer, UserSearch, Loader2 } from "lucide-react";
 import { loadStudents, Student } from "@/lib/students";
 
 interface Visit {
@@ -28,6 +28,12 @@ interface Props {
   teacherId: string;
 }
 
+interface StudentWithCount extends Student {
+  visitCount: number;
+}
+
+const PAGE = 1000;
+
 function getSchoolYearRange(): { start: string; end: string } {
   const today = new Date();
   const year = today.getFullYear();
@@ -38,57 +44,112 @@ function getSchoolYearRange(): { start: string; end: string } {
   return { start, end };
 }
 
+function studentKey(s: { grade: number; class: string; number: number; name: string }) {
+  return `${s.grade}|${s.class}|${s.number}|${s.name}`;
+}
+
 export default function StudentRecords({ teacherId }: Props) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Student | null>(null);
-  const [visits, setVisits] = useState<Visit[]>([]);
+  const [allVisits, setAllVisits] = useState<Visit[]>([]);
   const [loading, setLoading] = useState(false);
   const [dateRange, setDateRange] = useState(getSchoolYearRange);
+
+  const fetchAll = useCallback(
+    async (range: { start: string; end: string }) => {
+      setLoading(true);
+      const endDate = new Date(range.end);
+      endDate.setDate(endDate.getDate() + 1); // 종료일 포함
+      const startISO = new Date(range.start).toISOString();
+      const endISO = endDate.toISOString();
+
+      const visits: Visit[] = [];
+      let from = 0;
+      for (;;) {
+        const { data, error } = await supabase
+          .rpc("get_visits_decrypted", {
+            p_teacher_id: teacherId,
+            p_start_date: startISO,
+            p_end_date: endISO,
+          })
+          .range(from, from + PAGE - 1);
+        if (error) {
+          setLoading(false);
+          toast.error("기록을 불러오지 못했습니다.");
+          return;
+        }
+        const batch = (data as unknown as Visit[]) || [];
+        visits.push(...batch);
+        if (batch.length < PAGE) break;
+        from += PAGE;
+      }
+      setLoading(false);
+      setAllVisits(visits);
+    },
+    [teacherId]
+  );
+
+  useEffect(() => {
+    fetchAll(dateRange);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchAll]);
+
+  const handleApplyRange = () => {
+    setSelected(null);
+    fetchAll(dateRange);
+  };
+
+  // 검색 대상: 기록에 등장한 학생 + 명단 학생 (중복 제거)
+  const searchableStudents = useMemo<StudentWithCount[]>(() => {
+    const map = new Map<string, StudentWithCount>();
+    for (const v of allVisits) {
+      const key = `${v.student_grade}|${v.student_class}|${v.student_number}|${v.student_name}`;
+      const existing = map.get(key);
+      if (existing) {
+        existing.visitCount += 1;
+      } else {
+        map.set(key, {
+          grade: v.student_grade,
+          class: v.student_class,
+          number: v.student_number,
+          name: v.student_name,
+          visitCount: 1,
+        });
+      }
+    }
+    for (const s of loadStudents()) {
+      const key = studentKey(s);
+      if (!map.has(key)) {
+        map.set(key, { ...s, visitCount: 0 });
+      }
+    }
+    return [...map.values()];
+  }, [allVisits]);
 
   const results = useMemo(() => {
     const q = query.trim();
     if (q.length < 1) return [];
-    return loadStudents()
+    return searchableStudents
       .filter((s) => s.name.includes(q))
       .sort((a, b) => a.grade - b.grade || a.class.localeCompare(b.class, "ko") || a.number - b.number)
       .slice(0, 20);
-  }, [query]);
-
-  const fetchRecords = async (student: Student, range = dateRange) => {
-    setLoading(true);
-    const endDate = new Date(range.end);
-    endDate.setDate(endDate.getDate() + 1); // 종료일 포함
-    const { data, error } = await supabase.rpc("get_visits_decrypted", {
-      p_teacher_id: teacherId,
-      p_start_date: new Date(range.start).toISOString(),
-      p_end_date: endDate.toISOString(),
-    });
-    setLoading(false);
-    if (error) {
-      toast.error("기록을 불러오지 못했습니다.");
-      return;
-    }
-    const filtered = ((data as unknown as Visit[]) || []).filter(
-      (v) =>
-        v.student_name === student.name &&
-        v.student_grade === student.grade &&
-        v.student_class === student.class &&
-        v.student_number === student.number
-    );
-    setVisits(filtered);
-  };
+  }, [query, searchableStudents]);
 
   const handleSelect = (s: Student) => {
     setSelected(s);
     setQuery("");
-    const range = getSchoolYearRange();
-    setDateRange(range);
-    fetchRecords(s, range);
   };
 
-  const handleApplyRange = () => {
-    if (selected) fetchRecords(selected);
-  };
+  const visits = useMemo(() => {
+    if (!selected) return [];
+    return allVisits.filter(
+      (v) =>
+        v.student_name === selected.name &&
+        v.student_grade === selected.grade &&
+        v.student_class === selected.class &&
+        v.student_number === selected.number
+    );
+  }, [allVisits, selected]);
 
   const topIssues = useMemo(() => {
     const counts = new Map<string, number>();
@@ -116,16 +177,22 @@ export default function StudentRecords({ teacherId }: Props) {
             onChange={(e) => setQuery(e.target.value)}
           />
         </div>
+        {loading && (
+          <p className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            방문 기록을 불러오는 중입니다...
+          </p>
+        )}
         {query.trim().length > 0 && (
           <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
             {results.length === 0 ? (
               <p className="col-span-full py-4 text-center text-sm text-muted-foreground">
-                검색 결과가 없습니다. 학생명단에 등록된 이름인지 확인해 주세요.
+                검색 결과가 없습니다. 이름을 확인해 주세요.
               </p>
             ) : (
               results.map((s) => (
                 <button
-                  key={`${s.grade}-${s.class}-${s.number}`}
+                  key={studentKey(s)}
                   onClick={() => handleSelect(s)}
                   className="flex flex-col items-center rounded-xl border bg-background px-3 py-2 transition-colors hover:border-primary hover:bg-accent"
                 >
@@ -133,6 +200,7 @@ export default function StudentRecords({ teacherId }: Props) {
                     {s.grade}학년 {s.class}반 {s.number}번
                   </span>
                   <span className="font-semibold text-foreground">{s.name}</span>
+                  <span className="text-xs text-primary">방문 {s.visitCount}회</span>
                 </button>
               ))
             )}
