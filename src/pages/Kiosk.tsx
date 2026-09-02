@@ -58,8 +58,18 @@ export default function Kiosk() {
   // Fetch queue
   const fetchQueue = useCallback(async () => {
     if (!teacherId) return;
-    const { data } = await supabase.rpc("get_queue_decrypted", { p_teacher_id: teacherId });
-    if (data) setQueue(data as unknown as QueueItem[]);
+    const PAGE = 1000;
+    const all: QueueItem[] = [];
+    let from = 0;
+    for (;;) {
+      const { data, error } = await supabase.rpc("get_queue_decrypted", { p_teacher_id: teacherId }).range(from, from + PAGE - 1);
+      if (error) break;
+      const batch = (data as unknown as QueueItem[]) || [];
+      all.push(...batch);
+      if (batch.length < PAGE) break;
+      from += PAGE;
+    }
+    setQueue(all);
   }, [teacherId]);
 
   // Fetch treatment options

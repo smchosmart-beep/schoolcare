@@ -66,13 +66,14 @@ export default function VisitRecordModal({ open, onClose, visit, onSave, onDelet
   const fetchHistory = useCallback(async () => {
     if (!visit || !teacherId) return;
     setHistoryLoading(true);
-    const { data } = await supabase.rpc("get_visits_decrypted", {
+    const { data } = await supabase.rpc("get_student_visits_decrypted", {
       p_teacher_id: teacherId,
+      p_grade: visit.student_grade,
+      p_class: visit.student_class,
+      p_number: visit.student_number,
+      p_limit: 51, // 현재 기록 제외 후 최대 50건
     });
-    const allVisits = (data || []) as unknown as (HistoryRecord & { student_grade: number; student_class: string; student_number: number })[];
-    const filtered = allVisits
-      .filter(v => v.student_grade === visit.student_grade && v.student_class === visit.student_class && v.student_number === visit.student_number && v.id !== visit.id)
-      .slice(0, 50);
+    const filtered = ((data || []) as unknown as HistoryRecord[]).filter(v => v.id !== visit.id);
     setHistory(filtered);
     setHistoryLoading(false);
   }, [visit, teacherId]);

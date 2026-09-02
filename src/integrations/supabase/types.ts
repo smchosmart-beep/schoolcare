@@ -223,6 +223,33 @@ export type Database = {
           teacher_id: string
         }[]
       }
+      get_student_visits_decrypted: {
+        Args: {
+          p_class: string
+          p_grade: number
+          p_limit?: number
+          p_number: number
+          p_teacher_id: string
+        }
+        Returns: {
+          created_at: string
+          health_issue: string
+          id: string
+          medication: string
+          self_treatment_item: string
+          status: string
+          student_class: string
+          student_grade: number
+          student_name: string
+          student_number: number
+          teacher_id: string
+          temperature: string
+          treatment: string
+          updated_at: string
+          visit_type: string
+          visited_at: string
+        }[]
+      }
       get_visits_decrypted: {
         Args: {
           p_end_date?: string

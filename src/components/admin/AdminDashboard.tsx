@@ -73,14 +73,30 @@ export default function AdminDashboard({ teacherId }: Props) {
   today.setHours(0, 0, 0, 0);
   const todayStr = today.toISOString();
 
+  const PAGE = 1000;
+
+  const fetchPaged = useCallback(async (fn: string, args: Record<string, unknown>) => {
+    const all: unknown[] = [];
+    let from = 0;
+    for (;;) {
+      const { data, error } = await supabase.rpc(fn as never, args as never).range(from, from + PAGE - 1);
+      if (error) break;
+      const batch = (data as unknown as unknown[]) || [];
+      all.push(...batch);
+      if (batch.length < PAGE) break;
+      from += PAGE;
+    }
+    return all;
+  }, []);
+
   const fetchData = useCallback(async () => {
-    const [queueRes, visitsRes] = await Promise.all([
-      supabase.rpc("get_queue_decrypted", { p_teacher_id: teacherId }),
-      supabase.rpc("get_visits_decrypted", { p_teacher_id: teacherId, p_start_date: todayStr }),
+    const [queueAll, visitsAll] = await Promise.all([
+      fetchPaged("get_queue_decrypted", { p_teacher_id: teacherId }),
+      fetchPaged("get_visits_decrypted", { p_teacher_id: teacherId, p_start_date: todayStr }),
     ]);
 
-    const queueData = (queueRes.data || []) as unknown as QueueItem[];
-    const visitsData = (visitsRes.data || []) as unknown as Visit[];
+    const queueData = queueAll as QueueItem[];
+    const visitsData = visitsAll as Visit[];
 
     setQueue(queueData);
     setSelfVisits(visitsData.filter((v) => v.visit_type === "self_treatment"));

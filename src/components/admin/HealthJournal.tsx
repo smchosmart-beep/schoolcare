@@ -53,12 +53,22 @@ export default function HealthJournal({ teacherId }: Props) {
 
   const fetchVisits = useCallback(async () => {
     const { start, end } = getDateRange();
-    const { data } = await supabase.rpc("get_visits_decrypted", {
-      p_teacher_id: teacherId,
-      p_start_date: start.toISOString(),
-      p_end_date: end.toISOString(),
-    });
-    if (data) setVisits(data as unknown as Visit[]);
+    const PAGE = 1000;
+    const all: Visit[] = [];
+    let from = 0;
+    for (;;) {
+      const { data, error } = await supabase.rpc("get_visits_decrypted", {
+        p_teacher_id: teacherId,
+        p_start_date: start.toISOString(),
+        p_end_date: end.toISOString(),
+      }).range(from, from + PAGE - 1);
+      if (error) break;
+      const batch = (data as unknown as Visit[]) || [];
+      all.push(...batch);
+      if (batch.length < PAGE) break;
+      from += PAGE;
+    }
+    setVisits(all);
   }, [teacherId, getDateRange]);
 
   useEffect(() => {
