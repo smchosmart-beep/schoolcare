@@ -14,9 +14,13 @@
 - 모달이 열릴 때 기존 `visited_at` 값으로 초기화. 신규 기록은 현재 시각이 기본값이므로 평소 사용은 그대로.
 - 저장 시 `onSave` 데이터에 `visitedAt`을 포함해 전달.
 
-### 2. `src/components/admin/AdminDashboard.tsx`
-- `handleSaveVisit`에서 `visited_at`도 함께 UPDATE.
-- 대시보드는 "오늘" 기준으로만 목록을 불러오므로, 과거 날짜로 저장한 기록은 대시보드에서 빠지고 **방문기록/보건일지 탭에서 해당 날짜로 확인**됨. 저장 완료 토스트에 "방문기록 탭에서 확인할 수 있습니다" 안내 문구 추가.
+### 2. onSave 호출부 모두 수정 (모달 공유)
+`VisitRecordModal`은 `AdminDashboard`·`HealthJournal` 두 곳에서 공유되므로 두 호출부 모두 변경.
+
+- `onSave` 타입에 `visitedAt: string` 추가.
+- `src/components/admin/AdminDashboard.tsx` `handleSaveVisit`: `visited_at: data.visitedAt`을 UPDATE에 추가 (camelCase → `visited_at` 명시 매핑).
+- `src/components/admin/HealthJournal.tsx` `handleSave`: 동일하게 `visited_at` 추가. 기존 `...data` spread는 camelCase라 컬럼에 안 들어가므로, spread 후 `updateData.visited_at = data.visitedAt` 명시 할당 또는 spread 대상에서 visitedAt 제외 후 별도 매핑.
+- 대시보드는 "오늘" 기준으로만 목록을 불러오므로, 과거 날짜로 저장한 기록은 대시보드에서 빠지고 **보건일지(해당 날짜 이동 시)·방문기록 탭**에서 확인됨. 저장 완료 토스트에 "방문기록 탭에서 확인할 수 있습니다" 안내 문구 추가.
 
 ## 사용 흐름 예시
 1. 대시보드 "직접 기록" → 학생 선택 → 기록 작성 창이 열림
